@@ -44,23 +44,27 @@ tr.badrow{background:#fff7f7}
 .footer{margin:18px 0;color:var(--muted);font-size:12px}
 @media(max-width:800px){.stats{grid-template-columns:1fr 1fr}.header{padding:22px}}
 
-/* Única alteração solicitada: fundo do cabeçalho em vermelho */
+/* Cabeçalho atualizado */
 header {
   background: #b5121b !important;
-  background-image: none !important;
+  color: #fff !important;
 }
-</style>
 
-<style>
-/* Título e subtítulo em vermelho */
-header h1,
+header h1 {
+  font-family: "Segoe UI", "Inter", Arial, sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.5px;
+  color: #fff !important;
+}
+
 header p,
 header .subtitle,
 header small {
-  color: #b5121b !important;
+  font-family: "Segoe UI", "Inter", Arial, sans-serif !important;
+  font-weight: 400 !important;
+  color: #fff !important;
 }
 </style>
-
 </head>
 <body>
 <div class="header">
@@ -69,18 +73,17 @@ header small {
 </div>
 <div class="container">
   <div class="upload">
-    <strong>Selecione o PDF diário para conferir</strong><br>
+    <strong>Selecione o PDF do Gerencial para conferir</strong><br>
     <span style="color:#64748b;font-size:13px">
       O PDF será lido diretamente no navegador. Não é necessário converter para Excel.
     </span><br>
     <input id="file" type="file" accept="application/pdf,.pdf">
     <button class="primary" onclick="processar()">Conferir venda</button>
     <div id="progress" style="margin-top:14px;color:#475569;font-size:13px"></div>
-     <div id="autoInfo" style="margin-top:7px;color:#64748b;font-size:12px"></div>
   </div>
 
   <div class="notice">
-    <b>Regra da conferência:</b> quando o <b>VL. Gerencial</b> for maior ou igual à <b>Venda+eCommerce</b>, a diferença é considerada <b>OK</b> e exibida em verde. Só haverá divergência quando o VL. Gerencial for menor que a Venda+eCommerce. A <b>Diferença acumulada</b> considera somente as diferenças negativas.
+    <b>Regra da conferência:</b> quando o <b>VL. Gerencial</b> for maior ou igual à <b>Venda+eCommerce+CDAM</b>, a diferença é considerada <b>OK</b> e exibida em verde. Só haverá divergência quando o VL. Gerencial for menor que a Venda+eCommerce. A <b>Diferença acumulada</b> considera somente as diferenças negativas.
   </div>
 
   <div class="stats">
@@ -105,14 +108,14 @@ header small {
     <table>
       <thead>
         <tr>
-          <th>Filial</th><th>VL. Gerencial</th><th>Venda+eCommerce</th>
+          <th>Filial</th><th>VL. Gerencial</th><th>Venda+eCommerce+CDAM</th>
           <th>Diferença</th><th>VL. Devolução</th><th>VL. Líquido</th><th>Status</th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
     </table>
   </div>
-  <div class="footer">Relatório diário · Estrutura baseada no PDF/Excel fornecidos.</div>
+  <div class="footer">Relatório diário do Gerencial · Estrutura baseada no PDF fornecido.</div>
 </div>
 
 <script>
@@ -142,69 +145,6 @@ function mostrarArquivo() {
   const progress = document.getElementById("progress");
   if (f) progress.textContent = `Arquivo selecionado: ${f.name}`;
 }
-
-let desktopHandle = null;
-
-function nomePdfDaVendaHoje() {
-  const d = new Date();
-  const dd = String(d.getDate()).padStart(2, "0");
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  return `${dd}${mm}.pdf`;
-}
-
-async function selecionarPasta() {
-  if (!window.showDirectoryPicker) {
-    alert("Seu navegador não oferece acesso automático a pastas. Use o Google Chrome ou Microsoft Edge atualizado.");
-    return;
-  }
-  try {
-    desktopHandle = await window.showDirectoryPicker({mode:"read"});
-    const nome = nomePdfDaVendaHoje();
-    document.getElementById("autoInfo").textContent =
-      `Pasta vinculada. Procurando ${nome}...`;
-    await procurarPdfAutomaticamente();
-  } catch (err) {
-    if (err && err.name !== "AbortError") {
-      alert("Não foi possível vincular a pasta.\n\n" + err.message);
-    }
-  }
-}
-
-async function procurarPdfAutomaticamente() {
-  if (!desktopHandle) return false;
-  const nome = nomePdfDaVendaHoje();
-  const info = document.getElementById("autoInfo");
-  try {
-    const perm = await desktopHandle.queryPermission({mode:"read"});
-    if (perm !== "granted") {
-      info.textContent = `Permissão necessária. Clique em "Vincular Área de Trabalho" novamente.`;
-      return false;
-    }
-    const fh = await desktopHandle.getFileHandle(nome);
-    const arquivo = await fh.getFile();
-    const dt = new DataTransfer();
-    dt.items.add(new File([arquivo], arquivo.name, {
-      type:"application/pdf",
-      lastModified:arquivo.lastModified
-    }));
-    document.getElementById("file").files = dt.files;
-    document.getElementById("progress").textContent =
-      `PDF encontrado automaticamente: ${arquivo.name}`;
-    info.textContent = `Arquivo ${arquivo.name} localizado na pasta vinculada.`;
-    await processar();
-    return true;
-  } catch (err) {
-    info.textContent = `PDF ${nome} não encontrado na pasta vinculada.`;
-    return false;
-  }
-}
-
-async function restaurarPasta() {
-  document.getElementById("autoInfo").textContent =
-    `Selecione a Área de Trabalho uma vez para procurar automaticamente ${nomePdfDaVendaHoje()} após a atualização.`;
-}
-
-
 
 async function carregarPDFJS() {
   if (window.pdfjsLib) return;
@@ -357,8 +297,7 @@ function exportarCSV() {
   const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="conferencia_vendas.csv"; a.click();
 }
-window.addEventListener("DOMContentLoaded", restaurarPasta);
-// O PDF pode ser escolhido manualmente ou localizado automaticamente após vincular a pasta.
+// Não carrega dados automaticamente; o usuário escolhe o PDF.
 </script>
 </body>
 </html>
