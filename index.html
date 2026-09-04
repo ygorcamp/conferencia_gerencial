@@ -345,12 +345,13 @@ function atualizar() {
   const sum=dados.reduce((a,r)=>a+(r.diff< -0.005 ? r.diff : 0),0);
 
   const presentes=new Set(dados.map(r=>r.filial));
-  // A filial 19 não opera aos domingos e, portanto, não é considerada
-  // pendente quando o relatório for de um domingo.
   const domingo = dataRelatorio instanceof Date && dataRelatorio.getDay() === 0;
-  const filiaisEsperadasHoje = domingo
-    ? FILIAIS_ESPERADAS.filter(f => f !== 19)
-    : FILIAIS_ESPERADAS;
+
+  // Aos domingos, a filial 19 pode ou não funcionar.
+  // Portanto, sua ausência NUNCA gera pendência. Se ela estiver no PDF,
+  // ela é conferida normalmente e sua divergência impede a atualização.
+  // Se estiver ausente, isso também não impede a venda de ser considerada atualizada.
+  const filiaisEsperadasHoje = FILIAIS_ESPERADAS.filter(f => f !== 19);
   const pendentes=filiaisEsperadasHoje.filter(f=>!presentes.has(f));
 
   document.getElementById("ok").textContent=ok;
@@ -358,12 +359,12 @@ function atualizar() {
   document.getElementById("sum").textContent=moeda(sum.toFixed(2));
   const vendaAtualizada = document.getElementById("vendaAtualizada");
   if (vendaAtualizada) {
-    // Para domingo, a filial 19 não trabalha e sua ausência é esperada.
-    // A mensagem só aparece quando todas as filiais que deveriam operar
-    // estão presentes, não há divergências e, no domingo, a filial 19 não está no PDF.
+    // A filial 19 é opcional aos domingos: pode estar no PDF (se funcionou)
+    // ou pode estar ausente (se não funcionou). Nos dois casos, ela não gera
+    // pendência. Porém, se estiver presente e houver divergência, a venda
+    // NÃO será considerada atualizada.
     const todasFiliaisEsperadas = pendentes.length === 0;
-    const filial19AusenteNoDomingo = domingo ? !presentes.has(19) : true;
-    const todasOK = bad === 0 && todasFiliaisEsperadas && filial19AusenteNoDomingo;
+    const todasOK = bad === 0 && todasFiliaisEsperadas;
     vendaAtualizada.style.display = todasOK ? "block" : "none";
   }
   document.getElementById("pending").textContent=pendentes.length;
@@ -377,7 +378,7 @@ function atualizar() {
     box.style.background="#ecfdf5";
     box.style.color="#166534";
     box.innerHTML=domingo
-      ? "<b>Conferência de filiais:</b> todas as 58 filiais que operam aos domingos foram encontradas. A filial 19 não opera aos domingos e não é considerada pendente."
+      ? "<b>Conferência de filiais:</b> todas as filiais obrigatórias foram encontradas. A filial 19 é opcional aos domingos: se funcionar, será conferida normalmente; se não funcionar, sua ausência não gera pendência."
       : "<b>Conferência de filiais:</b> todas as 59 filiais esperadas foram encontradas no PDF.";
   }
 
