@@ -377,9 +377,14 @@ function atualizar() {
     box.style.display="block";
     box.style.background="#ecfdf5";
     box.style.color="#166534";
-    box.innerHTML=domingo
-      ? "<b>Conferência de filiais:</b> todas as filiais obrigatórias foram encontradas. A filial 19 é opcional aos domingos: se funcionar, será conferida normalmente; se não funcionar, sua ausência não gera pendência."
-      : "<b>Conferência de filiais:</b> todas as 59 filiais esperadas foram encontradas no PDF.";
+    // Aos domingos, a observação sobre a filial 19 só aparece quando ela
+    // não está presente no PDF. Se houver venda da filial 19, usa-se a
+    // mensagem padrão das 59 filiais.
+    if (domingo && !presentes.has(19)) {
+      box.innerHTML="<b>Conferência de filiais:</b> todas as filiais obrigatórias foram encontradas. A filial 19 normalmente não funciona aos domingos: Se funcionar, será conferida normalmente; caso a filial não tenha venda no dia, certifique-se de que realmente não funcionou.";
+    } else {
+      box.innerHTML="<b>Conferência de filiais:</b> todas as 59 filiais esperadas foram encontradas no PDF.";
+    }
   }
 
   render();
