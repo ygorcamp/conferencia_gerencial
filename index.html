@@ -22,17 +22,17 @@ body{margin:0;background:var(--bg);font-family:Inter,Segoe UI,Arial,sans-serif;c
 .upload{background:var(--card);border:2px dashed #d6a3a3;border-radius:16px;padding:24px;text-align:center;margin-bottom:20px}
 .upload strong{font-size:17px}
 input[type=file]{margin-top:14px}
-button{border:0;border-radius:9px;padding:11px 16px;font-weight:700;cursor:pointer}
+button{border:0;border-radius:8px;padding:9px 12px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap}
 .primary{background:var(--navy);color:white}
 .secondary{background:#f5e2e2;color:#7a1220}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}
-.stat{background:white;border-radius:14px;padding:18px;border:1px solid var(--line)}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:14px 0;align-items:stretch}
+.stat{background:white;border-radius:12px;padding:12px 14px;border:1px solid var(--line)}
 .stat .label{font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:700}
-.stat .num{font-size:28px;font-weight:800;margin-top:6px}
-.ok{color:var(--ok)} .bad{color:var(--bad)} .gooddiff{color:var(--ok);font-weight:800}
-.toolbar{background:white;padding:14px;border:1px solid var(--line);border-radius:14px;display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
-.search{flex:1;min-width:220px;padding:11px 13px;border:1px solid #e0b8b8;border-radius:9px;font-size:14px}
-select{padding:11px;border:1px solid #e0b8b8;border-radius:9px;background:white}
+.stat .num{font-size:22px;font-weight:800;margin-top:4px;white-space:nowrap}
+.ok{color:var(--ok)} .bad{color:var(--bad)} #pending{color:var(--bad)} .gooddiff{color:var(--ok);font-weight:800}
+.toolbar{background:white;padding:10px;border:1px solid var(--line);border-radius:12px;display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:nowrap}
+.search{flex:1;min-width:0;padding:9px 11px;border:1px solid #e0b8b8;border-radius:8px;font-size:13px}
+select{padding:9px 10px;border:1px solid #e0b8b8;border-radius:8px;background:white;font-size:13px;white-space:nowrap}
 .tablewrap{background:white;border:1px solid var(--line);border-radius:14px;overflow:auto}
 table{width:100%;border-collapse:collapse;min-width:900px}
 th{background:#f6dcdc;color:#7a1220;font-size:12px;text-transform:uppercase;padding:13px 12px;text-align:right;white-space:nowrap}
@@ -45,7 +45,7 @@ tr.badrow{background:#fff7f7}
 .okrow .status{color:var(--ok);font-weight:800}
 .notice{margin:15px 0;padding:13px 15px;border-radius:10px;background:#fdecec;color:#7a1220;font-size:13px}
 .footer{margin:18px 0;color:var(--muted);font-size:12px}
-@media(max-width:800px){.stats{grid-template-columns:1fr 1fr}.header{padding:22px}}
+@media(max-width:1000px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}} @media(max-width:800px){.stats{grid-template-columns:1fr 1fr}.header{padding:22px}}
 
 /* Cabeçalho atualizado */
 header {
@@ -94,7 +94,9 @@ header small {
     <div class="stat"><div class="label">Sem divergência</div><div id="ok" class="num ok">0</div></div>
     <div class="stat"><div class="label">Com divergência</div><div id="bad" class="num bad">0</div></div>
     <div class="stat"><div class="label">Diferença acumulada</div><div id="sum" class="num bad">R$ 0,00</div></div>
+    <div class="stat"><div class="label">Filiais pendentes</div><div id="pending" class="num bad">0</div></div>
   </div>
+  <div id="pendingBox" class="notice" style="display:none"></div>
 
   <div class="toolbar">
     <input id="search" class="search" placeholder="Pesquisar filial..." oninput="render()">
@@ -112,7 +114,7 @@ header small {
       <thead>
         <tr>
           <th>Filial</th><th>VL. Gerencial</th><th>Venda+eCommerce+CDAM</th>
-          <th>Diferença</th><th>VL. Devolução</th><th>VL. Líquido</th><th>Status</th>
+          <th>VL. Venda</th><th>VL. Devolução</th><th>VL. Líquido</th><th>Diferença</th><th>Status</th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
@@ -122,6 +124,7 @@ header small {
 </div>
 
 <script>
+const FILIAIS_ESPERADAS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 17, 18, 19, 24, 27, 28, 31, 32, 33, 36, 37, 38, 40, 41, 42, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 56, 57, 58, 63, 64, 71, 73, 75, 76, 77, 80, 81, 84, 85, 86, 87, 88, 89, 90, 91];
 const baseData = [{"filial": 1, "gerencial": "270.001,39", "venda": "270.001,39", "devolucao": "270.001,39", "liquido": "1.003,01"}, {"filial": 2, "gerencial": "446.561,76", "venda": "446.561,76", "devolucao": "445.809,31", "liquido": "4.077,76"}, {"filial": 3, "gerencial": "860.126,53", "venda": "860.126,53", "devolucao": "843.687,90", "liquido": "7.648,27"}, {"filial": 4, "gerencial": "272.337,86", "venda": "272.337,86", "devolucao": "272.337,86", "liquido": "5.990,99"}, {"filial": 5, "gerencial": "324.582,91", "venda": "324.582,91", "devolucao": "323.326,34", "liquido": "202,16"}, {"filial": 6, "gerencial": "243.879,34", "venda": "243.227,94", "devolucao": "236.651,10", "liquido": "2.004,80"}, {"filial": 7, "gerencial": "709.250,53", "venda": "709.044,56", "devolucao": "692.778,63", "liquido": "8.533,18"}, {"filial": 8, "gerencial": "367.538,40", "venda": "367.538,40", "devolucao": "367.538,40", "liquido": "206,79"}, {"filial": 9, "gerencial": "464.724,54", "venda": "464.724,54", "devolucao": "463.345,54", "liquido": "2.974,00"}, {"filial": 10, "gerencial": "323.138,62", "venda": "323.138,62", "devolucao": "323.138,62", "liquido": ""}, {"filial": 11, "gerencial": "361.608,04", "venda": "361.608,04", "devolucao": "361.608,04", "liquido": "564,51"}, {"filial": 12, "gerencial": "633.465,08", "venda": "632.080,22", "devolucao": "623.384,05", "liquido": "3.031,97"}, {"filial": 13, "gerencial": "7.156,35", "venda": "7.156,35", "devolucao": "7.156,35", "liquido": "12,90"}, {"filial": 17, "gerencial": "552.352,68", "venda": "552.352,68", "devolucao": "552.352,68", "liquido": "603,05"}, {"filial": 18, "gerencial": "825.713,28", "venda": "825.713,28", "devolucao": "805.727,11", "liquido": "3.146,56"}, {"filial": 19, "gerencial": "143.313,29", "venda": "142.614,29", "devolucao": "131.620,29", "liquido": "5.967,59"}, {"filial": 24, "gerencial": "967.834,97", "venda": "954.575,88", "devolucao": "898.055,25", "liquido": "30.995,57"}, {"filial": 27, "gerencial": "347.605,88", "venda": "347.605,88", "devolucao": "347.605,88", "liquido": "347,20"}, {"filial": 28, "gerencial": "731.115,95", "venda": "731.115,95", "devolucao": "713.920,03", "liquido": "9.250,36"}, {"filial": 31, "gerencial": "932.262,87", "venda": "930.483,87", "devolucao": "894.714,48", "liquido": "5.727,54"}, {"filial": 32, "gerencial": "533.306,30", "venda": "533.306,30", "devolucao": "525.617,84", "liquido": "2.301,39"}, {"filial": 33, "gerencial": "37.553,01", "venda": "547.119,56", "devolucao": "517.008,84", "liquido": "4.477,75"}, {"filial": 36, "gerencial": "361.896,77", "venda": "361.896,77", "devolucao": "354.189,24", "liquido": "843,64"}, {"filial": 37, "gerencial": "507.638,44", "venda": "507.638,44", "devolucao": "504.575,35", "liquido": "5.340,49"}, {"filial": 38, "gerencial": "555.414,28", "venda": "552.636,28", "devolucao": "447.780,35", "liquido": "3.110,60"}, {"filial": 40, "gerencial": "585.309,42", "venda": "585.309,42", "devolucao": "585.180,42", "liquido": "6.801,35"}, {"filial": 41, "gerencial": "42.428,39", "venda": "40.870,39", "devolucao": "16.784,50", "liquido": "209,00"}, {"filial": 42, "gerencial": "453.698,57", "venda": "453.698,57", "devolucao": "422.935,80", "liquido": "3.481,86"}, {"filial": 45, "gerencial": "27.684,16", "venda": "27.684,16", "devolucao": "27.684,16", "liquido": "64,03"}, {"filial": 46, "gerencial": "17.652,10", "venda": "17.652,10", "devolucao": "17.652,10", "liquido": "89,89"}, {"filial": 47, "gerencial": "352.411,65", "venda": "352.411,65", "devolucao": "344.867,59", "liquido": "1.301,15"}, {"filial": 48, "gerencial": "369.498,24", "venda": "369.498,24", "devolucao": "365.753,88", "liquido": "3.531,66"}, {"filial": 49, "gerencial": "14.022,35", "venda": "14.022,35", "devolucao": "14.022,35", "liquido": "15,95"}, {"filial": 50, "gerencial": "476.875,52", "venda": "476.875,52", "devolucao": "442.373,52", "liquido": "3.004,48"}, {"filial": 51, "gerencial": "18.987,10", "venda": "18.987,10", "devolucao": "18.987,10", "liquido": "13,00"}, {"filial": 52, "gerencial": "11.110,46", "venda": "11.110,46", "devolucao": "11.110,46", "liquido": ""}, {"filial": 53, "gerencial": "15.403,71", "venda": "15.403,71", "devolucao": "15.403,71", "liquido": "41,00"}, {"filial": 54, "gerencial": "566.914,47", "venda": "566.914,47", "devolucao": "566.914,47", "liquido": "1.399,62"}, {"filial": 56, "gerencial": "10.340,11", "venda": "10.340,11", "devolucao": "10.340,11", "liquido": "74,75"}, {"filial": 57, "gerencial": "17.137,36", "venda": "17.137,36", "devolucao": "17.137,36", "liquido": "5,99"}, {"filial": 58, "gerencial": "11.333,44", "venda": "11.333,44", "devolucao": "11.333,44", "liquido": "20,50"}, {"filial": 63, "gerencial": "8.246,64", "venda": "8.246,64", "devolucao": "8.246,64", "liquido": "41,56"}, {"filial": 64, "gerencial": "7.972,81", "venda": "7.972,81", "devolucao": "7.972,81", "liquido": "9,95"}, {"filial": 71, "gerencial": "17.331,85", "venda": "17.331,85", "devolucao": "17.331,85", "liquido": "20,00"}, {"filial": 73, "gerencial": "18.681,04", "venda": "18.681,04", "devolucao": "18.681,04", "liquido": "20,00"}, {"filial": 75, "gerencial": "13.374,92", "venda": "13.374,92", "devolucao": "13.374,92", "liquido": "22,40"}, {"filial": 76, "gerencial": "14.068,28", "venda": "14.068,28", "devolucao": "14.068,28", "liquido": ""}, {"filial": 77, "gerencial": "10.539,92", "venda": "10.539,92", "devolucao": "10.539,92", "liquido": ""}, {"filial": 80, "gerencial": "8.010,31", "venda": "8.010,31", "devolucao": "8.010,31", "liquido": "43,93"}, {"filial": 81, "gerencial": "15.964,26", "venda": "15.964,26", "devolucao": "15.964,26", "liquido": "49,90"}, {"filial": 84, "gerencial": "8.979,73", "venda": "8.979,73", "devolucao": "8.979,73", "liquido": "8,95"}, {"filial": 85, "gerencial": "22.006,79", "venda": "22.006,79", "devolucao": "22.006,79", "liquido": "53,76"}, {"filial": 86, "gerencial": "4.316,97", "venda": "4.316,97", "devolucao": "4.316,97", "liquido": "9,00"}, {"filial": 87, "gerencial": "9.671,90", "venda": "9.671,90", "devolucao": "9.671,90", "liquido": ""}, {"filial": 88, "gerencial": "17.805,92", "venda": "17.805,92", "devolucao": "17.805,92", "liquido": ""}, {"filial": 89, "gerencial": "18.230,42", "venda": "18.230,42", "devolucao": "18.230,42", "liquido": "130,30"}, {"filial": 90, "gerencial": "6.528,45", "venda": "6.528,45", "devolucao": "6.528,45", "liquido": "35,00"}, {"filial": 91, "gerencial": "14.003,22", "venda": "14.003,22", "devolucao": "14.003,22", "liquido": "84,89"}];
 let dados = [];
 
@@ -224,30 +227,33 @@ function parsePDF(lines){
   for(const raw of lines){
     const line=raw.replace(/\s+/g," ").trim();
 
-    // Expected report row:
-    // FILIAL + 2 to 5 Brazilian-number fields.
-    // Example: 6 243.879,34 243.227,94 2.004,80 241.223,14 236.651,10
-    const m=line.match(/^(\d{1,3})\s+([\d.]+,\d{2})(?:\s+([\d.]+,\d{2}))?(?:\s+([\d.]+,\d{2}))?(?:\s+([\d.]+,\d{2}))?(?:\s+([\d.]+,\d{2}))?$/);
+    // Estrutura do PDF:
+    // FILIAL | VL. GERENCIAL | VENDA+eCOMMERCE | VL.VENDA | VL.DEVOLUÇÃO | VL.LIQUIDO
+    const m=line.match(/^(\d{1,3})\s+(.+)$/);
     if(!m) continue;
 
     const filial=Number(m[1]);
-    const gerencial=m[2];
-    const venda=m[3];
+    const valores=m[2].match(/[\d.]+,\d{2}/g);
+    if(!valores || valores.length < 3) continue;
 
-    // The report's first two monetary columns are the ones to compare.
-    if(!venda) continue;
+    const gerencial=valores[0];
+    const venda=valores[1];
+    const vlVenda=valores[2];
+    const devolucao=valores[3]||"";
+    const liquido=valores[4]||"";
 
     result.push({
       filial,
       gerencial,
       venda,
-      devolucao:m[4]||"",
-      liquido:m[5]||"",
+      vlVenda,
+      devolucao,
+      liquido,
       diff:numero(gerencial)-numero(venda)
     });
   }
 
-  // Avoid duplicate rows if a PDF has repeated header/table content.
+  // Evita duplicidades quando o PDF repete cabeçalho/tabela em outra página.
   const seen=new Set();
   return result.filter(r=>{
     const k=String(r.filial);
@@ -256,15 +262,31 @@ function parsePDF(lines){
     return true;
   });
 }
-
 function atualizar() {
   document.getElementById("total").textContent=dados.length;
   const ok=dados.filter(r=>r.diff>=-0.005).length;
   const bad=dados.length-ok;
   const sum=dados.reduce((a,r)=>a+(r.diff< -0.005 ? r.diff : 0),0);
+
+  const presentes=new Set(dados.map(r=>r.filial));
+  const pendentes=FILIAIS_ESPERADAS.filter(f=>!presentes.has(f));
+
   document.getElementById("ok").textContent=ok;
   document.getElementById("bad").textContent=bad;
   document.getElementById("sum").textContent=moeda(sum.toFixed(2));
+  document.getElementById("pending").textContent=pendentes.length;
+
+  const box=document.getElementById("pendingBox");
+  if(pendentes.length){
+    box.style.display="block";
+    box.innerHTML=`<b>Filiais pendentes (${pendentes.length}):</b> ${pendentes.join(", ")}.`;
+  }else{
+    box.style.display="block";
+    box.style.background="#ecfdf5";
+    box.style.color="#166534";
+    box.innerHTML="<b>Conferência de filiais:</b> todas as 59 filiais esperadas foram encontradas no PDF.";
+  }
+
   render();
 }
 function render() {
@@ -284,18 +306,19 @@ function render() {
       <td><b>${r.filial}</b></td>
       <td>${moeda(r.gerencial)}</td>
       <td>${moeda(r.venda)}</td>
-      <td class="diff ${isok ? "gooddiff" : ""}">${moeda(r.diff.toFixed(2))}</td>
+      <td>${moeda(r.vlVenda)}</td>
       <td>${moeda(r.devolucao)}</td>
       <td>${moeda(r.liquido)}</td>
+      <td class="diff ${isok ? "gooddiff" : ""}">${moeda(r.diff.toFixed(2))}</td>
       <td class="status">${isok?'OK':'DIVERGÊNCIA'}</td>
     </tr>`;
   }).join("");
 }
 function exportarCSV() {
-  let csv="FILIAL;VL. GERENCIAL;VENDA+eCOMMERCE;DIFERENÇA;VL.DEVOLUÇÃO;VL.LIQUIDO;STATUS\n";
+  let csv="FILIAL;VL. GERENCIAL;VENDA+eCOMMERCE;VL.VENDA;VL.DEVOLUÇÃO;VL.LIQUIDO;DIFERENÇA;STATUS\n";
   dados.forEach(r=>{
     const ok=r.diff>=-0.005;
-    csv += [r.filial,r.gerencial,r.venda,r.diff.toFixed(2).replace(".",","),r.devolucao,r.liquido,ok?"OK":"DIVERGÊNCIA"].join(";")+"\n";
+    csv += [r.filial,r.gerencial,r.venda,r.vlVenda,r.devolucao,r.liquido,r.diff.toFixed(2).replace(".",","),ok?"OK":"DIVERGÊNCIA"].join(";")+"\n";
   });
   const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="conferencia_vendas.csv"; a.click();
