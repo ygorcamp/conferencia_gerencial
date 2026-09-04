@@ -164,6 +164,19 @@ async function carregarPDFJS() {
   if (!window.pdfjsLib) throw new Error("Leitor de PDF não carregado.");
 }
 
+let dataRelatorio = null;
+
+function obterDataDoArquivo(nome) {
+  const m = String(nome || "").match(/^(\d{2})(\d{2})\.pdf$/i);
+  if (!m) return null;
+  const dia = Number(m[1]);
+  const mes = Number(m[2]);
+  const ano = new Date().getFullYear();
+  const d = new Date(ano, mes - 1, dia);
+  if (d.getFullYear() !== ano || d.getMonth() !== mes - 1 || d.getDate() !== dia) return null;
+  return d;
+}
+
 async function processar() {
   const f=document.getElementById("file").files[0];
   const progress=document.getElementById("progress");
@@ -172,6 +185,8 @@ async function processar() {
     alert("Selecione um arquivo PDF.");
     return;
   }
+
+  dataRelatorio = obterDataDoArquivo(f.name);
 
   try{
     progress.textContent="Lendo o PDF...";
@@ -269,7 +284,13 @@ function atualizar() {
   const sum=dados.reduce((a,r)=>a+(r.diff< -0.005 ? r.diff : 0),0);
 
   const presentes=new Set(dados.map(r=>r.filial));
-  const pendentes=FILIAIS_ESPERADAS.filter(f=>!presentes.has(f));
+  // A filial 19 não opera aos domingos e, portanto, não é considerada
+  // pendente quando o relatório for de um domingo.
+  const domingo = dataRelatorio instanceof Date && dataRelatorio.getDay() === 0;
+  const filiaisEsperadasHoje = domingo
+    ? FILIAIS_ESPERADAS.filter(f => f !== 19)
+    : FILIAIS_ESPERADAS;
+  const pendentes=filiaisEsperadasHoje.filter(f=>!presentes.has(f));
 
   document.getElementById("ok").textContent=ok;
   document.getElementById("bad").textContent=bad;
@@ -284,7 +305,9 @@ function atualizar() {
     box.style.display="block";
     box.style.background="#ecfdf5";
     box.style.color="#166534";
-    box.innerHTML="<b>Conferência de filiais:</b> todas as 59 filiais esperadas foram encontradas no PDF.";
+    box.innerHTML=domingo
+      ? "<b>Conferência de filiais:</b> todas as 58 filiais que operam aos domingos foram encontradas. A filial 19 não opera aos domingos e não é considerada pendente."
+      : "<b>Conferência de filiais:</b> todas as 59 filiais esperadas foram encontradas no PDF.";
   }
 
   render();
