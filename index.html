@@ -310,8 +310,12 @@ function atualizar() {
   document.getElementById("sum").textContent=moeda(sum.toFixed(2));
   const vendaAtualizada = document.getElementById("vendaAtualizada");
   if (vendaAtualizada) {
-    const totalEsperado = typeof filiaisEsperadas !== "undefined" ? filiaisEsperadas.length : 59;
-    const todasOK = bad === 0 && dados.length === totalEsperado;
+    // Para domingo, a filial 19 não trabalha e sua ausência é esperada.
+    // A mensagem só aparece quando todas as filiais que deveriam operar
+    // estão presentes, não há divergências e, no domingo, a filial 19 não está no PDF.
+    const todasFiliaisEsperadas = pendentes.length === 0;
+    const filial19AusenteNoDomingo = domingo ? !presentes.has(19) : true;
+    const todasOK = bad === 0 && todasFiliaisEsperadas && filial19AusenteNoDomingo;
     vendaAtualizada.style.display = todasOK ? "block" : "none";
   }
   document.getElementById("pending").textContent=pendentes.length;
