@@ -80,6 +80,9 @@ header small {
     <span style="color:#64748b;font-size:13px">
       O PDF será lido diretamente no navegador. Não é necessário converter para Excel.
     </span><br>
+    <span style="display:inline-block;margin-top:8px;color:#7a1220;font-size:13px;font-weight:700">
+      Importante: anexe o PDF com o nome da data no padrão <b>DDMM.pdf</b> (dia + mês). Exemplo: <b>0209.pdf</b> = 02 de setembro.
+    </span><br>
     <input id="file" type="file" accept="application/pdf,.pdf">
     <button class="primary" onclick="processar()">Analisar PDF</button>
     <div id="progress" style="margin-top:14px;color:#475569;font-size:13px"></div>
@@ -187,6 +190,11 @@ async function processar() {
   }
 
   dataRelatorio = obterDataDoArquivo(f.name);
+  if(!dataRelatorio){
+    alert("O nome do PDF deve seguir exatamente o padrão DDMM.pdf.\n\nExemplo: 0209.pdf = 02 de setembro.");
+    progress.textContent="";
+    return;
+  }
 
   try{
     progress.textContent="Lendo o PDF...";
