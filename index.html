@@ -101,6 +101,9 @@ header small {
   </div>
   <div id="pendingBox" class="notice" style="display:none"></div>
 
+  <div id="vendaAtualizada" style="display:none;margin:15px 0;padding:15px 18px;border-radius:10px;background:#dcfce7;color:#15803d;font-size:15px;font-weight:800;text-align:center;border:1px solid #bbf7d0;">
+    ✓ Venda atualizada — todas as filiais estão OK e não há nenhuma divergência.
+  </div>
   <div class="toolbar">
     <input id="search" class="search" placeholder="Pesquisar filial..." oninput="render()">
     <select id="status" onchange="render()">
@@ -303,6 +306,12 @@ function atualizar() {
   document.getElementById("ok").textContent=ok;
   document.getElementById("bad").textContent=bad;
   document.getElementById("sum").textContent=moeda(sum.toFixed(2));
+  const vendaAtualizada = document.getElementById("vendaAtualizada");
+  if (vendaAtualizada) {
+    const totalEsperado = typeof filiaisEsperadas !== "undefined" ? filiaisEsperadas.length : 59;
+    const todasOK = bad === 0 && dados.length === totalEsperado;
+    vendaAtualizada.style.display = todasOK ? "block" : "none";
+  }
   document.getElementById("pending").textContent=pendentes.length;
 
   const box=document.getElementById("pendingBox");
@@ -346,13 +355,56 @@ function render() {
   }).join("");
 }
 function exportarCSV() {
-  let csv="FILIAL;VL. GERENCIAL;VENDA+eCOMMERCE;VL.VENDA;VL.DEVOLUÇÃO;VL.LIQUIDO;DIFERENÇA;STATUS\n";
+  let csv="FILIAL;VL. GERENCIAL;VENDA+eCOMMERCE;VL. VENDA;VL.DEVOLUÇÃO;VL.LIQUIDO;DIVERGÊNCIA;STATUS\n";
   dados.forEach(r=>{
     const ok=r.diff>=-0.005;
-    csv += [r.filial,r.gerencial,r.venda,r.vlVenda,r.devolucao,r.liquido,r.diff.toFixed(2).replace(".",","),ok?"OK":"DIVERGÊNCIA"].join(";")+"\n";
+    csv += [
+      r.filial,
+      r.gerencial,
+      r.venda || "",
+      r.vlVenda || "",
+      r.devolucao || "",
+      r.liquido || "",
+      r.diff.toFixed(2).replace(".",","),
+      ok?"OK":"DIVERGÊNCIA"
+    ].join(";")+"\n";
   });
+
   const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="conferencia_vendas.csv"; a.click();
+  const a=document.createElement("a");
+  const url=URL.createObjectURL(blob);
+  a.href=url;
+
+  // Usa a data que já foi validada a partir do nome do PDF.
+  // Ex.: 0209.pdf -> conferencia_gerencial_0209.csv
+  let dataPDF = "";
+  if (dataRelatorio instanceof Date && !isNaN(dataRelatorio.getTime())) {
+    const dia = String(dataRelatorio.getDate()).padStart(2,"0");
+    const mes = String(dataRelatorio.getMonth()+1).padStart(2,"0");
+    dataPDF = dia + mes;
+  }
+
+  // Fallback direto pelo nome do arquivo selecionado.
+  if (!dataPDF) {
+    const arquivo = document.getElementById("file").files[0];
+    if (arquivo) {
+      const m = arquivo.name.trim().match(/^(\d{2})(\d{2})(?:\.pdf)$/i);
+      if (m) dataPDF = m[1] + m[2];
+    }
+  }
+
+  if (!dataPDF) {
+    alert("Não foi possível identificar a data do PDF para criar o nome do CSV.");
+    URL.revokeObjectURL(url);
+    return;
+  }
+
+  a.download = `conferencia_gerencial_${dataPDF}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 // Não carrega dados automaticamente; o usuário escolhe o PDF.
 </script>
