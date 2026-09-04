@@ -15,35 +15,65 @@
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text)}
-.header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:white;padding:28px 34px}
-.header h1{margin:0;font-size:27px;font-weight:700}
-.header p{margin:7px 0 0;color:#fbdada;font-size:14px}
-.container{max-width:1450px;margin:24px auto;padding:0 22px}
-.upload{background:var(--card);border:2px dashed #d6a3a3;border-radius:16px;padding:24px;text-align:center;margin-bottom:20px}
-.upload strong{font-size:17px}
-input[type=file]{margin-top:14px}
-button{border:0;border-radius:8px;padding:9px 12px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap}
+.header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:white;padding:26px 34px;box-shadow:0 2px 10px rgba(122,13,19,.18)}
+.header h1{margin:0;font-size:25px;font-weight:700;display:flex;align-items:center;gap:10px}
+.header p{margin:6px 0 0;color:#fbdada;font-size:13.5px}
+.container{max-width:1300px;margin:26px auto;padding:0 22px}
+
+/* Seção superior: upload + regra lado a lado */
+.top-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:stretch;margin-bottom:22px}
+@media(max-width:900px){.top-grid{grid-template-columns:1fr}}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 3px rgba(122,13,19,.05)}
+.card-title{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#a34a4a;margin:0 0 12px}
+
+.upload{border:2px dashed #d6a3a3;border-radius:14px;padding:22px;text-align:center;display:flex;flex-direction:column;gap:4px;justify-content:center}
+.upload strong{font-size:16px}
+.upload .hint{color:#8a6b6b;font-size:12.5px}
+.upload .warn{display:inline-block;margin-top:6px;color:#7a1220;font-size:12.5px;font-weight:700;background:#fdecec;border-radius:8px;padding:8px 10px}
+.upload-controls{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:14px;flex-wrap:wrap}
+input[type=file]{font-size:13px;max-width:220px}
+button{border:0;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap;transition:filter .15s}
+button:hover{filter:brightness(0.95)}
 .primary{background:var(--navy);color:white}
 .secondary{background:#f5e2e2;color:#7a1220}
-.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:14px 0;align-items:stretch}
-.stat{background:white;border-radius:12px;padding:12px 14px;border:1px solid var(--line)}
-.stat .label{font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:700}
-.stat .num{font-size:22px;font-weight:800;margin-top:4px;white-space:nowrap}
+#progress{margin-top:10px;color:#6d4b4b;font-size:12.5px;min-height:16px}
+
+.rule-card{padding:20px 22px;display:flex;flex-direction:column;justify-content:center}
+.rule-card p{margin:0;font-size:13px;line-height:1.55;color:#5b4444}
+
+/* Cards de estatísticas */
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 18px;align-items:stretch}
+.stat{background:white;border-radius:12px;padding:14px 16px;border:1px solid var(--line);border-top:3px solid var(--line);text-align:left}
+.stat.accent-ok{border-top-color:var(--ok)}
+.stat.accent-bad{border-top-color:var(--bad)}
+.stat .label{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700;letter-spacing:.03em}
+.stat .num{font-size:24px;font-weight:800;margin-top:6px;white-space:nowrap}
 .ok{color:var(--ok)} .bad{color:var(--bad)} #pending{color:var(--bad)} .gooddiff{color:var(--ok);font-weight:800}
-.toolbar{background:white;padding:10px;border:1px solid var(--line);border-radius:12px;display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:nowrap}
-.search{flex:1;min-width:0;padding:9px 11px;border:1px solid #e0b8b8;border-radius:8px;font-size:13px}
-select{padding:9px 10px;border:1px solid #e0b8b8;border-radius:8px;background:white;font-size:13px;white-space:nowrap}
+
+/* Faixas de status (pendência / venda referente / atualizada) */
+.status-stack{display:flex;flex-direction:row;flex-wrap:wrap;gap:10px;margin-bottom:16px;align-items:stretch}
+.status-stack > div{flex:1 1 240px;min-width:0;display:flex;align-items:center;justify-content:center}
+.status-stack .notice,
+.status-stack > div{padding:9px 14px !important;font-size:13px !important;margin:0}
+.status-stack #dataVenda,
+.status-stack #vendaAtualizada{font-size:13.5px !important}
+
+.toolbar{background:white;padding:12px;border:1px solid var(--line);border-radius:12px;display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.search{flex:1;min-width:180px;padding:10px 12px;border:1px solid #e0b8b8;border-radius:8px;font-size:13px}
+select{padding:10px 12px;border:1px solid #e0b8b8;border-radius:8px;background:white;font-size:13px;white-space:nowrap}
 .tablewrap{background:white;border:1px solid var(--line);border-radius:14px;overflow:auto}
 table{width:100%;border-collapse:collapse;min-width:900px}
-th{background:#f6dcdc;color:#7a1220;font-size:12px;text-transform:uppercase;padding:13px 12px;text-align:right;white-space:nowrap}
+th{background:#f6dcdc;color:#7a1220;font-size:12px;text-transform:uppercase;padding:13px 12px;text-align:right;white-space:nowrap;position:sticky;top:0}
 th:first-child,td:first-child{text-align:center}
 td{padding:12px;border-top:1px solid var(--line);font-size:13px;text-align:right}
+tbody tr:hover{background:#fff9f9}
 tr.badrow{background:#fff7f7}
 .diff{font-weight:800}
 .badrow .diff{color:var(--bad)}
 .badrow .status{color:var(--bad);font-weight:800}
 .okrow .status{color:var(--ok);font-weight:800}
-.notice{margin:15px 0;padding:13px 15px;border-radius:10px;background:#fdecec;color:#7a1220;font-size:13px}
+.notice{margin:0 0 18px;padding:10px 14px;border-radius:10px;background:#fdecec;color:#7a1220;font-size:13px;line-height:1.45}
 .footer{margin:18px 0;color:var(--muted);font-size:12px}
 @media(max-width:1000px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}} @media(max-width:800px){.stats{grid-template-columns:1fr 1fr}.header{padding:22px}}
 
@@ -73,52 +103,58 @@ header small {
 </head>
 <body>
 <div class="header">
-  <h1>Conferência do Gerencial</h1>
+  <h1>📊 Conferência do Gerencial</h1>
   <p>Líder Comércio e Indústria Ltda · Conferência de Vendas</p>
 </div>
 <div class="container">
-  <div class="upload">
-    <strong>Selecione o PDF para conferir</strong><br>
-    <span style="color:#64748b;font-size:13px">
-      O PDF será lido diretamente no navegador. Não é necessário converter para Excel.
-    </span><br>
-    <span style="display:inline-block;margin-top:8px;color:#7a1220;font-size:13px;font-weight:700">
-      Importante: anexe o PDF com o nome da data no padrão <b>DDMM.pdf</b> (dia + mês). Exemplo: <b>0209.pdf</b> = 02 de setembro.
-    </span><br>
-    <input id="file" type="file" accept="application/pdf,.pdf">
-    <button class="primary" onclick="processar()">Analisar PDF</button>
-    <div id="progress" style="margin-top:14px;color:#475569;font-size:13px"></div>
-  </div>
 
-  <div class="notice">
-    <b>Regra da conferência:</b> quando o <b>VL. Gerencial</b> for maior ou igual à <b>Venda+eCommerce+CDAM</b>, a diferença é considerada <b>OK</b> (atualizada) e exibida em verde. Só haverá divergência quando o VL. Gerencial for menor que a Venda+eCommerce+CDAM. A <b>Diferença acumulada</b> considera somente as diferenças negativas (divergências).
+  <div class="top-grid">
+    <div class="card upload">
+      <strong>Selecione o PDF para conferir</strong>
+      <span class="hint">O PDF será lido diretamente no navegador. Não é necessário converter para Excel.</span>
+      <span class="warn">Importante: anexe o PDF com o nome da data no padrão <b>DDMM.pdf</b> (dia + mês). Exemplo: <b>0209.pdf</b> = 02 de setembro.</span>
+      <div class="upload-controls">
+        <input id="file" type="file" accept="application/pdf,.pdf">
+        <button class="primary" onclick="processar()">Analisar PDF</button>
+      </div>
+      <div id="progress"></div>
+    </div>
+
+    <div class="card rule-card">
+      <p class="card-title">Regra da conferência</p>
+      <p>Quando o <b>VL. Gerencial</b> for maior ou igual à <b>Venda+eCommerce+CDAM</b>, a diferença é considerada <b>OK</b> (atualizada) e exibida em verde.<br><br>
+      Só haverá divergência quando o VL. Gerencial for menor que a Venda+eCommerce+CDAM. A <b>Diferença acumulada</b> considera somente as diferenças negativas (divergências).</p>
+    </div>
   </div>
 
   <div class="stats">
     <div class="stat"><div class="label">Filiais analisadas</div><div id="total" class="num">0</div></div>
-    <div class="stat"><div class="label">Sem divergência</div><div id="ok" class="num ok">0</div></div>
-    <div class="stat"><div class="label">Com divergência</div><div id="bad" class="num bad">0</div></div>
-    <div class="stat"><div class="label">Diferença acumulada</div><div id="sum" class="num bad">R$ 0,00</div></div>
-    <div class="stat"><div class="label">Filiais pendentes</div><div id="pending" class="num bad">0</div></div>
+    <div class="stat accent-ok"><div class="label">Sem divergência</div><div id="ok" class="num ok">0</div></div>
+    <div class="stat accent-bad"><div class="label">Com divergência</div><div id="bad" class="num bad">0</div></div>
+    <div class="stat accent-bad"><div class="label">Diferença acumulada</div><div id="sum" class="num bad">R$ 0,00</div></div>
+    <div class="stat accent-bad"><div class="label">Filiais pendentes</div><div id="pending" class="num bad">0</div></div>
   </div>
-  <div id="pendingBox" class="notice" style="display:none"></div>
 
+  <div class="status-stack">
+    <div id="pendingBox" class="notice" style="display:none"></div>
+    <div id="dataVenda" style="display:none;padding:9px 14px;border-radius:10px;background:#fff7ed;color:#9a3412;font-weight:800;text-align:center;border:1px solid #fed7aa;">
+      📅 Venda referente ao dia <span id="dataVendaTexto">--/--/----</span>
+    </div>
+    <div id="vendaAtualizada" style="display:none;padding:9px 14px;border-radius:10px;background:#dcfce7;color:#15803d;font-weight:800;text-align:center;border:1px solid #bbf7d0;">
+      ✓ Venda atualizada — todas as filiais estão OK e não há nenhuma divergência.
+    </div>
+  </div>
 
-  <div id="dataVenda" style="display:none;margin:15px 0;padding:14px 18px;border-radius:10px;background:#fff7ed;color:#9a3412;font-size:15px;font-weight:800;text-align:center;border:1px solid #fed7aa;">
-    📅 Venda referente ao dia <span id="dataVendaTexto">--/--/----</span>
-  </div>
-  <div id="vendaAtualizada" style="display:none;margin:15px 0;padding:15px 18px;border-radius:10px;background:#dcfce7;color:#15803d;font-size:15px;font-weight:800;text-align:center;border:1px solid #bbf7d0;">
-    ✓ Venda atualizada — todas as filiais estão OK e não há nenhuma divergência.
-  </div>
   <div class="toolbar">
-    <input id="search" class="search" placeholder="Pesquisar filial..." oninput="render()">
+    <input id="search" class="search" placeholder="🔍 Pesquisar filial..." oninput="render()">
     <select id="status" onchange="render()">
       <option value="todos">Todas</option>
       <option value="ok">Somente atualizadas</option>
       <option value="maior">Gerencial maior</option>
       <option value="bad">Somente divergências</option>
     </select>
-    <button class="secondary" onclick="exportarCSV()">Exportar CSV</button>
+    <button class="secondary" onclick="exportarCSV()">⬇ Exportar CSV</button>
+    <button class="secondary" onclick="exportarPDF()">📄 Exportar PDF</button>
   </div>
 
   <div class="tablewrap">
@@ -425,6 +461,123 @@ function exportarCSV() {
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 // Não carrega dados automaticamente; o usuário escolhe o PDF.
+
+async function carregarJsPDF() {
+  if (window.jspdf && window.jspdf.jsPDF) return;
+  await new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+    script.onload = resolve;
+    script.onerror = () => reject(new Error("Não foi possível carregar o gerador de PDF. Verifique a conexão com a internet e tente novamente."));
+    document.head.appendChild(script);
+  });
+  await new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js";
+    script.onload = resolve;
+    script.onerror = () => reject(new Error("Não foi possível carregar o gerador de tabela do PDF."));
+    document.head.appendChild(script);
+  });
+  if (!window.jspdf || !window.jspdf.jsPDF) throw new Error("Gerador de PDF não carregado.");
+}
+
+function nomeArquivoData() {
+  let dataPDF = "";
+  if (dataRelatorio instanceof Date && !isNaN(dataRelatorio.getTime())) {
+    const dia = String(dataRelatorio.getDate()).padStart(2,"0");
+    const mes = String(dataRelatorio.getMonth()+1).padStart(2,"0");
+    dataPDF = dia + mes;
+  }
+  if (!dataPDF) {
+    const arquivo = document.getElementById("file").files[0];
+    if (arquivo) {
+      const m = arquivo.name.trim().match(/^(\d{2})(\d{2})(?:\.pdf)$/i);
+      if (m) dataPDF = m[1] + m[2];
+    }
+  }
+  return dataPDF;
+}
+
+async function exportarPDF() {
+  if (!dados.length) {
+    alert("Nenhum dado analisado para exportar. Analise um PDF primeiro.");
+    return;
+  }
+
+  const dataPDF = nomeArquivoData();
+  if (!dataPDF) {
+    alert("Não foi possível identificar a data do PDF para criar o nome do arquivo.");
+    return;
+  }
+
+  const progress = document.getElementById("progress");
+  try {
+    if (progress) progress.textContent = "Gerando PDF...";
+    await carregarJsPDF();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+
+    const dataTexto = dataRelatorio instanceof Date
+      ? dataRelatorio.toLocaleDateString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric" })
+      : "";
+
+    doc.setFontSize(15);
+    doc.setTextColor(181, 18, 27);
+    doc.text("Conferência do Gerencial", 40, 38);
+    doc.setFontSize(10);
+    doc.setTextColor(90, 90, 90);
+    doc.text(
+      `Líder Comércio e Indústria Ltda${dataTexto ? " · Venda referente ao dia " + dataTexto : ""}`,
+      40, 54
+    );
+
+    const ok = dados.filter(r => r.diff >= -0.005).length;
+    const bad = dados.length - ok;
+    const sum = dados.reduce((a, r) => a + (r.diff < -0.005 ? r.diff : 0), 0);
+    doc.setFontSize(9);
+    doc.setTextColor(120, 90, 90);
+    doc.text(
+      `Filiais analisadas: ${dados.length}   ·   Sem divergência: ${ok}   ·   Com divergência: ${bad}   ·   Diferença acumulada: ${moeda(sum.toFixed(2))}`,
+      40, 70
+    );
+
+    const head = [["Filial","VL. Gerencial","Venda+eCommerce+CDAM","VL. Venda","VL. Devolução","VL. Líquido","Diferença","Status"]];
+    const body = dados.map(r => {
+      const isok = r.diff >= -0.005;
+      return [
+        r.filial,
+        moeda(r.gerencial),
+        moeda(r.venda),
+        moeda(r.vlVenda),
+        moeda(r.devolucao),
+        moeda(r.liquido),
+        moeda(r.diff.toFixed(2)),
+        isok ? "OK" : "DIVERGÊNCIA"
+      ];
+    });
+
+    doc.autoTable({
+      head, body,
+      startY: 84,
+      styles: { fontSize: 8, cellPadding: 5, textColor: [30, 41, 59] },
+      headStyles: { fillColor: [181, 18, 27], textColor: 255, fontStyle: "bold" },
+      alternateRowStyles: { fillColor: [253, 246, 246] },
+      columnStyles: { 0: { halign: "center" } },
+      didParseCell: (data) => {
+        if (data.section === "body" && data.column.index === 7) {
+          data.cell.styles.fontStyle = "bold";
+          data.cell.styles.textColor = data.cell.raw === "DIVERGÊNCIA" ? [185, 28, 28] : [21, 128, 61];
+        }
+      }
+    });
+
+    doc.save(`conferencia_gerencial_${dataPDF}.pdf`);
+    if (progress) progress.textContent = "";
+  } catch (err) {
+    alert(err.message || "Não foi possível gerar o PDF.");
+    if (progress) progress.textContent = "";
+  }
+}
 </script>
 
   <div style="text-align:center;margin:22px 0 8px;color:#7a5a5a;font-size:12px;font-weight:600;">
