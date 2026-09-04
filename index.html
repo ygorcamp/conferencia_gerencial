@@ -103,6 +103,10 @@ header small {
   </div>
   <div id="pendingBox" class="notice" style="display:none"></div>
 
+
+  <div id="dataVenda" style="display:none;margin:15px 0;padding:14px 18px;border-radius:10px;background:#fff7ed;color:#9a3412;font-size:15px;font-weight:800;text-align:center;border:1px solid #fed7aa;">
+    📅 Venda referente ao dia <span id="dataVendaTexto">--/--/----</span>
+  </div>
   <div id="vendaAtualizada" style="display:none;margin:15px 0;padding:15px 18px;border-radius:10px;background:#dcfce7;color:#15803d;font-size:15px;font-weight:800;text-align:center;border:1px solid #bbf7d0;">
     ✓ Venda atualizada — todas as filiais estão OK e não há nenhuma divergência.
   </div>
@@ -200,6 +204,14 @@ async function processar() {
     progress.textContent="";
     return;
   }
+
+  // Mostra a data da venda identificada no nome do PDF (DDMM).
+  const dataVendaBox = document.getElementById("dataVenda");
+  const dataVendaTexto = document.getElementById("dataVendaTexto");
+  dataVendaTexto.textContent = dataRelatorio.toLocaleDateString("pt-BR", {
+    day: "2-digit", month: "2-digit", year: "numeric"
+  });
+  dataVendaBox.style.display = "block";
 
   try{
     progress.textContent="Lendo o PDF...";
