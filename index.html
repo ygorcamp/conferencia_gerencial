@@ -71,6 +71,7 @@ tbody tr:hover{background:#fff9f9}
 tr.badrow{background:#fff7f7}
 .diff{font-weight:800}
 .badrow .diff{color:var(--bad)}
+.pendingrow{background:#fff7f7}.pendingrow .status{color:var(--bad);font-weight:800}
 .badrow .status{color:var(--bad);font-weight:800}
 .okrow .status{color:var(--ok);font-weight:800}
 .notice{margin:0 0 18px;padding:10px 14px;border-radius:10px;background:#fdecec;color:#7a1220;font-size:13px;line-height:1.45}
@@ -136,7 +137,6 @@ header small {
   </div>
 
   <div class="status-stack">
-    <div id="pendingBox" class="notice" style="display:none"></div>
     <div id="dataVenda" style="display:none;padding:9px 14px;border-radius:10px;background:#fff7ed;color:#9a3412;font-weight:800;text-align:center;border:1px solid #fed7aa;">
       📅 Venda referente ao dia <span id="dataVendaTexto">--/--/----</span>
     </div>
@@ -152,6 +152,8 @@ header small {
       <option value="ok">Somente atualizadas</option>
       <option value="maior">Gerencial maior</option>
       <option value="bad">Somente divergências</option>
+      <option value="pending">Somente pendências</option>
+      <option value="bad_pending">Divergências e Pendências</option>
     </select>
     <button class="secondary" onclick="exportarCSV()">⬇ Exportar CSV</button>
     <button class="secondary" onclick="exportarPDF()">📄 Exportar PDF</button>
@@ -339,70 +341,92 @@ function parsePDF(lines){
   });
 }
 function atualizar() {
-  document.getElementById("total").textContent=dados.length;
-  const ok=dados.filter(r=>r.diff>=-0.005).length;
-  const bad=dados.length-ok;
-  const sum=dados.reduce((a,r)=>a+(r.diff< -0.005 ? r.diff : 0),0);
-
-  const presentes=new Set(dados.map(r=>r.filial));
+  // Monta a lista completa das 59 filiais esperadas.
+  // Filiais ausentes no PDF entram como PENDÊNCIA, com os valores financeiros em branco.
+  const presentes = new Set(dados.map(r => r.filial));
   const domingo = dataRelatorio instanceof Date && dataRelatorio.getDay() === 0;
 
-  // Aos domingos, a filial 19 pode ou não funcionar.
-  // Portanto, sua ausência NUNCA gera pendência. Se ela estiver no PDF,
-  // ela é conferida normalmente e sua divergência impede a atualização.
-  // Se estiver ausente, isso também não impede a venda de ser considerada atualizada.
-  const filiaisEsperadasHoje = FILIAIS_ESPERADAS.filter(f => f !== 19);
-  const pendentes=filiaisEsperadasHoje.filter(f=>!presentes.has(f));
+  const filiaisEsperadasHoje = FILIAIS_ESPERADAS.filter(f => !(domingo && f === 19));
+  const pendentes = filiaisEsperadasHoje.filter(f => !presentes.has(f));
 
-  document.getElementById("ok").textContent=ok;
-  document.getElementById("bad").textContent=bad;
-  document.getElementById("sum").textContent=moeda(sum.toFixed(2));
+  // Mantém os dados encontrados e adiciona as filiais ausentes como linhas vazias.
+  const mapa = new Map(dados.map(r => [r.filial, r]));
+  const dadosCompletos = FILIAIS_ESPERADAS
+    .filter(f => !(domingo && f === 19 && !presentes.has(19)))
+    .map(f => mapa.get(f) || {
+      filial: f,
+      gerencial: "",
+      venda: "",
+      vlVenda: "",
+      devolucao: "",
+      liquido: "",
+      diff: null,
+      pendente: true
+    });
+
+  dados = dadosCompletos;
+
+  const comDados = dados.filter(r => !r.pendente);
+  const ok = comDados.filter(r => r.diff >= -0.005).length;
+  const bad = comDados.filter(r => r.diff < -0.005).length;
+  const sum = comDados.reduce((a, r) => a + (r.diff < -0.005 ? r.diff : 0), 0);
+
+  document.getElementById("total").textContent = FILIAIS_ESPERADAS.length;
+  document.getElementById("ok").textContent = ok;
+  document.getElementById("bad").textContent = bad;
+  document.getElementById("sum").textContent = moeda(sum.toFixed(2));
+
   const vendaAtualizada = document.getElementById("vendaAtualizada");
   if (vendaAtualizada) {
-    // A filial 19 é opcional aos domingos: pode estar no PDF (se funcionou)
-    // ou pode estar ausente (se não funcionou). Nos dois casos, ela não gera
-    // pendência. Porém, se estiver presente e houver divergência, a venda
-    // NÃO será considerada atualizada.
+    // Filial 19 continua opcional aos domingos.
     const todasFiliaisEsperadas = pendentes.length === 0;
     const todasOK = bad === 0 && todasFiliaisEsperadas;
     vendaAtualizada.style.display = todasOK ? "block" : "none";
   }
-  document.getElementById("pending").textContent=pendentes.length;
 
-  const box=document.getElementById("pendingBox");
-  if(pendentes.length){
-    box.style.display="block";
-    box.innerHTML=`<b>Filiais pendentes (${pendentes.length}):</b> ${pendentes.join(", ")}.`;
-  }else{
-    box.style.display="block";
-    box.style.background="#ecfdf5";
-    box.style.color="#166534";
-    // Aos domingos, a observação sobre a filial 19 só aparece quando ela
-    // não está presente no PDF. Se houver venda da filial 19, usa-se a
-    // mensagem padrão das 59 filiais.
-    if (domingo && !presentes.has(19)) {
-      box.innerHTML="<b>Conferência de filiais:</b> todas as filiais esperadas foram encontradas no PDF, exceto a filial 19: verificar se houve abertura excepcional neste domingo ou se a filial permaneceu fechada.";
-    } else {
-      box.innerHTML="<b>Conferência de filiais:</b> todas as 59 filiais esperadas foram encontradas no PDF.";
-    }
-  }
+  document.getElementById("pending").textContent = pendentes.length;
 
   render();
 }
 function render() {
-  const q=document.getElementById("search").value.toLowerCase();
-  const st=document.getElementById("status").value;
-  const rows=dados.filter(r => {
-    const isok=r.diff>=-0.005;
-    return String(r.filial).includes(q) &&
-      (st==="todos" ||
-       (st==="ok"&&isok) ||
-       (st==="maior"&&r.diff>0.005) ||
-       (st==="bad"&&!isok));
+  const q = document.getElementById("search").value.toLowerCase();
+  const st = document.getElementById("status").value;
+
+  const rows = dados.filter(r => {
+    const isPending = !!r.pendente;
+    const isBad = !isPending && r.diff < -0.005;
+    const isOk = !isPending && r.diff >= -0.005;
+    const isMaior = !isPending && r.diff > 0.005;
+
+    const matchesSearch = String(r.filial).includes(q);
+
+    const matchesStatus =
+      st === "todos" ||
+      (st === "ok" && isOk) ||
+      (st === "maior" && isMaior) ||
+      (st === "bad" && isBad) ||
+      (st === "pending" && isPending) ||
+      (st === "bad_pending" && (isBad || isPending));
+
+    return matchesSearch && matchesStatus;
   });
-  document.getElementById("tbody").innerHTML=rows.map(r=>{
-    const isok=r.diff>=-0.005;
-    return `<tr class="${isok?'okrow':'badrow'}">
+
+  document.getElementById("tbody").innerHTML = rows.map(r => {
+    if (r.pendente) {
+      return `<tr class="pendingrow">
+        <td><b>${r.filial}</b></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="status">PENDÊNCIA</td>
+      </tr>`;
+    }
+
+    const isok = r.diff >= -0.005;
+    return `<tr class="${isok ? 'okrow' : 'badrow'}">
       <td><b>${r.filial}</b></td>
       <td>${moeda(r.gerencial)}</td>
       <td>${moeda(r.venda)}</td>
@@ -410,23 +434,29 @@ function render() {
       <td>${moeda(r.devolucao)}</td>
       <td>${moeda(r.liquido)}</td>
       <td class="diff ${isok ? "gooddiff" : ""}">${moeda(r.diff.toFixed(2))}</td>
-      <td class="status">${isok?'OK':'DIVERGÊNCIA'}</td>
+      <td class="status">${isok ? 'OK' : 'DIVERGÊNCIA'}</td>
     </tr>`;
   }).join("");
 }
 function exportarCSV() {
-  let csv="FILIAL;VL. GERENCIAL;VENDA+eCOMMERCE;VL. VENDA;VL.DEVOLUÇÃO;VL.LIQUIDO;DIVERGÊNCIA;STATUS\n";
-  dados.forEach(r=>{
-    const ok=r.diff>=-0.005;
+  let csv="FILIAL;VL. GERENCIAL;VENDA+eCOMMERCE+CDAM;VL. VENDA;VL.DEVOLUÇÃO;VL.LIQUIDO;DIVERGÊNCIA;STATUS\n";
+
+  dados.forEach(r => {
+    if (r.pendente) {
+      csv += [r.filial, "", "", "", "", "", "", "PENDÊNCIA"].join(";") + "\n";
+      return;
+    }
+
+    const ok = r.diff >= -0.005;
     csv += [
       r.filial,
-      r.gerencial,
+      r.gerencial || "",
       r.venda || "",
       r.vlVenda || "",
       r.devolucao || "",
       r.liquido || "",
       r.diff.toFixed(2).replace(".",","),
-      ok?"OK":"DIVERGÊNCIA"
+      ok ? "OK" : "DIVERGÊNCIA"
     ].join(";")+"\n";
   });
 
@@ -435,8 +465,6 @@ function exportarCSV() {
   const url=URL.createObjectURL(blob);
   a.href=url;
 
-  // Usa a data que já foi validada a partir do nome do PDF.
-  // Ex.: 0209.pdf -> conferencia_gerencial_0209.csv
   let dataPDF = "";
   if (dataRelatorio instanceof Date && !isNaN(dataRelatorio.getTime())) {
     const dia = String(dataRelatorio.getDate()).padStart(2,"0");
@@ -444,7 +472,6 @@ function exportarCSV() {
     dataPDF = dia + mes;
   }
 
-  // Fallback direto pelo nome do arquivo selecionado.
   if (!dataPDF) {
     const arquivo = document.getElementById("file").files[0];
     if (arquivo) {
@@ -537,18 +564,23 @@ async function exportarPDF() {
       40, 54
     );
 
-    const ok = dados.filter(r => r.diff >= -0.005).length;
-    const bad = dados.length - ok;
-    const sum = dados.reduce((a, r) => a + (r.diff < -0.005 ? r.diff : 0), 0);
+    const comDados = dados.filter(r => !r.pendente);
+    const ok = comDados.filter(r => r.diff >= -0.005).length;
+    const bad = comDados.filter(r => r.diff < -0.005).length;
+    const pendentesPDF = dados.filter(r => r.pendente).length;
+    const sum = comDados.reduce((a, r) => a + (r.diff < -0.005 ? r.diff : 0), 0);
     doc.setFontSize(9);
     doc.setTextColor(120, 90, 90);
     doc.text(
-      `Filiais analisadas: ${dados.length}   ·   Sem divergência: ${ok}   ·   Com divergência: ${bad}   ·   Diferença acumulada: ${moeda(sum.toFixed(2))}`,
+      `Filiais analisadas: ${FILIAIS_ESPERADAS.length}   ·   Sem divergência: ${ok}   ·   Com divergência: ${bad}   ·   Pendências: ${pendentesPDF}   ·   Diferença acumulada: ${moeda(sum.toFixed(2))}`,
       40, 70
     );
 
     const head = [["Filial","VL. Gerencial","Venda+eCommerce+CDAM","VL. Venda","VL. Devolução","VL. Líquido","Diferença","Status"]];
     const body = dados.map(r => {
+      if (r.pendente) {
+        return [r.filial, "", "", "", "", "", "", "PENDÊNCIA"];
+      }
       const isok = r.diff >= -0.005;
       return [
         r.filial,
@@ -572,7 +604,10 @@ async function exportarPDF() {
       didParseCell: (data) => {
         if (data.section === "body" && data.column.index === 7) {
           data.cell.styles.fontStyle = "bold";
-          data.cell.styles.textColor = data.cell.raw === "DIVERGÊNCIA" ? [185, 28, 28] : [21, 128, 61];
+          data.cell.styles.textColor =
+            data.cell.raw === "DIVERGÊNCIA" || data.cell.raw === "PENDÊNCIA"
+              ? [185, 28, 28]
+              : [21, 128, 61];
         }
       }
     });
