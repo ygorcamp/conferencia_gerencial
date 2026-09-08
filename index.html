@@ -145,6 +145,10 @@ header small {
     </div>
   </div>
 
+  <div id="observacaoFilial19" class="notice" style="display:none;">
+    ℹ️ <b>Observação:</b> aos domingos, a <b>filial 19</b> normalmente não funciona. Por isso, embora a conferência considere as <b>59 filiais cadastradas</b>, aos domingos são esperadas <b>58 filiais de venda</b>. A filial 19 só será considerada obrigatória quando houver venda registrada nessa data.
+  </div>
+
   <div class="toolbar">
     <input id="search" class="search" placeholder="🔍 Pesquisar filial..." oninput="render()">
     <select id="status" onchange="render()">
@@ -339,13 +343,24 @@ function parsePDF(lines){
   });
 }
 function atualizar() {
-  // Monta a lista completa das 59 filiais esperadas.
-  // Filiais ausentes no PDF entram como PENDÊNCIA, com os valores financeiros em branco.
+  // Existem 59 filiais cadastradas.
+  // Aos domingos, a filial 19 é opcional quando não há venda registrada.
+  // Assim, a conferência considera 58 filiais esperadas nesses domingos,
+  // sem marcar a filial 19 como pendência. Se a filial 19 aparecer no PDF,
+  // ela é analisada normalmente.
   const presentes = new Set(dados.map(r => r.filial));
   const domingo = dataRelatorio instanceof Date && dataRelatorio.getDay() === 0;
 
-  const filiaisEsperadasHoje = FILIAIS_ESPERADAS.filter(f => !(domingo && f === 19));
+  // Aos domingos, a filial 19 normalmente não funciona.
+  // Ela deixa de ser obrigatória somente quando não aparece no PDF.
+  // Se houver venda da filial 19 no domingo, ela continua sendo analisada normalmente.
+  const filiaisEsperadasHoje = FILIAIS_ESPERADAS.filter(f => !(domingo && f === 19 && !presentes.has(19)));
   const pendentes = filiaisEsperadasHoje.filter(f => !presentes.has(f));
+
+  const observacaoFilial19 = document.getElementById("observacaoFilial19");
+  if (observacaoFilial19) {
+    observacaoFilial19.style.display = domingo ? "block" : "none";
+  }
 
   // Mantém os dados encontrados e adiciona as filiais ausentes como linhas vazias.
   const mapa = new Map(dados.map(r => [r.filial, r]));
@@ -369,7 +384,7 @@ function atualizar() {
   const bad = comDados.filter(r => r.diff < -0.005).length;
   const sum = comDados.reduce((a, r) => a + (r.diff < -0.005 ? r.diff : 0), 0);
 
-  document.getElementById("total").textContent = FILIAIS_ESPERADAS.length;
+  document.getElementById("total").textContent = filiaisEsperadasHoje.length;
   document.getElementById("ok").textContent = ok;
   document.getElementById("bad").textContent = bad;
   document.getElementById("sum").textContent = moeda(sum.toFixed(2));
@@ -566,11 +581,15 @@ async function exportarPDF() {
     const ok = comDados.filter(r => r.diff >= -0.005).length;
     const bad = comDados.filter(r => r.diff < -0.005).length;
     const pendentesPDF = dados.filter(r => r.pendente).length;
+    const domingoPDF = dataRelatorio instanceof Date && dataRelatorio.getDay() === 0;
+    const presentesPDF = new Set(dados.filter(r => !r.pendente).map(r => r.filial));
+    const filial19AusenteDomingoPDF = domingoPDF && !presentesPDF.has(19);
+    const filiaisEsperadasPDF = FILIAIS_ESPERADAS.length - (filial19AusenteDomingoPDF ? 1 : 0);
     const sum = comDados.reduce((a, r) => a + (r.diff < -0.005 ? r.diff : 0), 0);
     doc.setFontSize(9);
     doc.setTextColor(120, 90, 90);
     doc.text(
-      `Filiais analisadas: ${FILIAIS_ESPERADAS.length}   ·   Sem divergência: ${ok}   ·   Com divergência: ${bad}   ·   Pendências: ${pendentesPDF}   ·   Diferença acumulada: ${moeda(sum.toFixed(2))}`,
+      `Filiais cadastradas: ${FILIAIS_ESPERADAS.length}   ·   Filiais esperadas na data: ${filiaisEsperadasPDF}   ·   Sem divergência: ${ok}   ·   Com divergência: ${bad}   ·   Pendências: ${pendentesPDF}   ·   Diferença acumulada: ${moeda(sum.toFixed(2))}`,
       40, 70
     );
 
