@@ -381,7 +381,7 @@ function atualizar() {
     // não está presente no PDF. Se houver venda da filial 19, usa-se a
     // mensagem padrão das 59 filiais.
     if (domingo && !presentes.has(19)) {
-      box.innerHTML="<b>Conferência de filiais:</b> todas as filiais esperadas foram encontradas, exceto a filial 19: verificar se houve abertura excepcional neste domingo ou se a filial permaneceu fechada.";
+      box.innerHTML="<b>Conferência de filiais:</b> todas as filiais esperadas foram encontradas no PDF, exceto a filial 19: verificar se houve abertura excepcional neste domingo ou se a filial permaneceu fechada.";
     } else {
       box.innerHTML="<b>Conferência de filiais:</b> todas as 59 filiais esperadas foram encontradas no PDF.";
     }
