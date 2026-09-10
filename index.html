@@ -856,6 +856,11 @@ async function exportarPDF() {
   }
 
   const progress = document.getElementById("progress");
+  const tituloOriginal = document.title;
+  // O navegador usa o título da página como sugestão de nome de arquivo
+  // na tela de "Salvar como PDF" — assim o PDF fica com o mesmo padrão
+  // de nome usado no CSV (ex.: conferencia_gerencial_0209).
+  document.title = `conferencia_gerencial_${dataPDF}`;
 
   try {
     montarRelatorioPDF();
@@ -863,10 +868,12 @@ async function exportarPDF() {
     setTimeout(() => {
       window.print();
       document.body.classList.remove("export-pdf-mode");
+      document.title = tituloOriginal;
       if (progress) progress.textContent = "";
     }, 100);
   } catch (err) {
     document.body.classList.remove("export-pdf-mode");
+    document.title = tituloOriginal;
     if (progress) progress.textContent = "";
     alert("Não foi possível abrir a impressão.\n\n" + (err.message || err));
   }
