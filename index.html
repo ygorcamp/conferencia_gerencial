@@ -6,225 +6,122 @@
 <title>Conferência do Gerencial</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --navy:#b5121b; --navy2:#7a0d13; --bg:#fbf3f3; --card:#fff;
-  --text:#1e293b; --muted:#7a5a5a; --line:#f0d9d9;
-  --ok:#15803d; --okbg:#dcfce7; --bad:#b91c1c; --badbg:#fee2e2;
+:root{
+  --ink:#18212b;--ink2:#263442;--paper:#f3f6f8;--card:#ffffff;
+  --line:#dce4e9;--muted:#687784;--accent:#0f766e;--accent2:#115e59;
+  --accent-soft:#e6f4f2;--orange:#d97706;--orange-soft:#fff4df;
+  --green:#16803c;--green-soft:#eaf7ef;--red:#c2413b;--red-soft:#fdeceb;
+  --shadow:0 12px 35px rgba(24,33,43,.08);
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text)}
-.header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:white;padding:26px 34px;box-shadow:0 2px 10px rgba(122,13,19,.18)}
-.header h1{margin:0;font-size:25px;font-weight:700;display:flex;align-items:center;gap:10px}
-.header p{margin:6px 0 0;color:#fbdada;font-size:13.5px}
-.container{max-width:1300px;margin:26px auto;padding:0 22px}
-
-/* Seção superior: upload + regra lado a lado */
-.top-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:stretch;margin-bottom:22px}
-@media(max-width:900px){.top-grid{grid-template-columns:1fr}}
-
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 3px rgba(122,13,19,.05)}
-.card-title{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#a34a4a;margin:0 0 12px}
-
-.upload{border:2px dashed #d6a3a3;border-radius:14px;padding:22px;text-align:center;display:flex;flex-direction:column;gap:4px;justify-content:center}
-.upload strong{font-size:16px}
-.upload .hint{color:#8a6b6b;font-size:12.5px}
-.upload .warn{display:inline-block;margin-top:6px;color:#7a1220;font-size:12.5px;font-weight:700;background:#fdecec;border-radius:8px;padding:8px 10px}
-.upload-controls{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:14px;flex-wrap:wrap}
-input[type=file]{font-size:13px;max-width:220px}
-button{border:0;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap;transition:filter .15s}
-button:hover{filter:brightness(0.95)}
-.primary{background:var(--navy);color:white}
-.secondary{background:#f5e2e2;color:#7a1220}
-#progress{margin-top:10px;color:#6d4b4b;font-size:12.5px;min-height:16px}
-
-.rule-card{padding:20px 22px;display:flex;flex-direction:column;justify-content:center}
-.rule-card p{margin:0;font-size:13px;line-height:1.55;color:#5b4444}
-
-/* Cards de estatísticas */
-.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 18px;align-items:stretch}
-.stat{background:white;border-radius:12px;padding:14px 16px;border:1px solid var(--line);border-top:3px solid var(--line);text-align:left}
-.stat.accent-ok{border-top-color:var(--ok)}
-.stat.accent-bad{border-top-color:var(--bad)}
-.stat .label{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700;letter-spacing:.03em}
-.stat .num{font-size:24px;font-weight:800;margin-top:6px;white-space:nowrap}
-.ok{color:var(--ok)} .bad{color:var(--bad)} #pending{color:var(--bad)} .gooddiff{color:var(--ok);font-weight:800}
-
-/* Faixas de status (pendência / venda referente / atualizada) */
-.status-stack{display:flex;flex-direction:row;flex-wrap:wrap;gap:10px;margin-bottom:16px;align-items:stretch}
-.status-stack > div{flex:1 1 240px;min-width:0;display:flex;align-items:center;justify-content:center}
-.status-stack .notice,
-.status-stack > div{padding:9px 14px !important;font-size:13px !important;margin:0}
-.status-stack #dataVenda,
-.status-stack #vendaAtualizada{font-size:13.5px !important}
-
-.toolbar{background:white;padding:12px;border:1px solid var(--line);border-radius:12px;display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
-.search{flex:1;min-width:180px;padding:10px 12px;border:1px solid #e0b8b8;border-radius:8px;font-size:13px}
-select{padding:10px 12px;border:1px solid #e0b8b8;border-radius:8px;background:white;font-size:13px;white-space:nowrap}
-.tablewrap{background:white;border:1px solid var(--line);border-radius:14px;overflow:auto}
-table{width:100%;border-collapse:collapse;min-width:900px}
-th{background:#f6dcdc;color:#7a1220;font-size:12px;text-transform:uppercase;padding:13px 12px;text-align:left;white-space:nowrap;position:sticky;top:0}
-th:first-child,td:first-child{text-align:left}
-td{padding:12px;border-top:1px solid var(--line);font-size:13px;text-align:left}
-tbody tr:hover{background:#fff9f9}
-tr.badrow{background:#fff7f7}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Manrope","Segoe UI",Arial,sans-serif}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.28;background-image:radial-gradient(#cbd5dc .65px,transparent .65px);background-size:14px 14px;z-index:-1}
+.header{background:var(--ink);color:#fff;padding:0 34px;box-shadow:0 8px 28px rgba(24,33,43,.16)}
+.header-inner{max-width:1360px;margin:auto;min-height:108px;display:flex;align-items:center;justify-content:space-between;gap:25px}
+.brand{display:flex;align-items:center;gap:16px}
+.brand-mark{width:46px;height:46px;border-radius:14px;background:linear-gradient(145deg,#14b8a6,#0f766e);display:grid;place-items:center;box-shadow:0 8px 22px rgba(20,184,166,.25);font-size:22px}
+.header h1{margin:0;font-family:"Space Grotesk",sans-serif;font-size:27px;letter-spacing:-.7px;font-weight:700}
+.header p{margin:5px 0 0;color:#b9c6cf;font-size:12.5px}
+.header-badge{border:1px solid #40505d;color:#dce6eb;border-radius:999px;padding:8px 13px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.container{max-width:1360px;margin:30px auto;padding:0 24px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,.85fr);gap:18px;margin-bottom:20px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+.upload{padding:27px;min-height:220px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;border:1px solid #cfdde2}
+.upload:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-65px;top:-70px;background:var(--accent-soft)}
+.eyebrow{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:9px}
+.upload strong{font-family:"Space Grotesk",sans-serif;font-size:22px;position:relative;z-index:1}
+.hint{color:var(--muted);font-size:12.5px;margin-top:6px;position:relative;z-index:1}
+.warn{display:inline-block;align-self:flex-start;margin-top:14px;color:#8a5a0a;background:var(--orange-soft);border:1px solid #f5d59e;border-radius:10px;padding:9px 11px;font-size:12px;position:relative;z-index:1}
+.upload-controls{display:flex;gap:10px;align-items:center;margin-top:18px;position:relative;z-index:1}
+button{border:0;border-radius:10px;padding:11px 16px;font-family:inherit;font-weight:800;cursor:pointer;font-size:12.5px;transition:.18s;white-space:nowrap}
+button:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(24,33,43,.12)}
+.primary{background:var(--accent);color:#fff}
+.secondary{background:#edf2f4;color:var(--ink);border:1px solid #d8e1e5}
+#progress{margin-top:12px;color:var(--muted);font-size:12px;min-height:16px}
+.rule-card{padding:27px;display:flex;flex-direction:column;justify-content:center;background:linear-gradient(145deg,#fff,#f8fbfc)}
+.rule-icon{font-size:22px;margin-bottom:12px}
+.card-title{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 9px}
+.rule-card p:last-child{margin:0;color:#53636f;font-size:12.5px;line-height:1.7}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 18px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px 18px;position:relative;overflow:hidden;box-shadow:0 5px 18px rgba(24,33,43,.045)}
+.stat:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:#cdd7dd}
+.stat.accent-ok:before{background:var(--green)}
+.stat.accent-bad:before{background:var(--red)}
+.stat .label{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:.07em}
+.stat .num{font-family:"Space Grotesk",sans-serif;font-size:24px;font-weight:700;margin-top:8px;white-space:nowrap}
+.ok{color:var(--green)}.bad{color:var(--red)}#pending{color:var(--red)}.gooddiff{color:var(--green);font-weight:800}
+.status-stack{display:flex;gap:12px;margin-bottom:15px;align-items:stretch}
+.status-stack>div{flex:1;min-width:0}
+.status-stack #dataVenda{padding:13px 16px!important;border-radius:14px!important;background:var(--orange-soft)!important;color:#8a5a0a!important;border:1px solid #f0d59f!important;font-weight:800!important;text-align:center!important;font-size:12.5px!important}
+.status-stack #vendaAtualizada{padding:13px 16px!important;border-radius:14px!important;background:var(--green-soft)!important;color:var(--green)!important;border:1px solid #bfe3ca!important;font-weight:800!important;text-align:center!important;font-size:12.5px!important}
+.notice{margin:0 0 15px!important;padding:12px 15px!important;border-radius:13px!important;background:#edf2f4!important;color:#4f5e69!important;border:1px solid #d8e1e5;font-size:12px!important;line-height:1.5}
+.toolbar{background:#fff;padding:12px;border:1px solid var(--line);border-radius:16px;display:flex;gap:9px;align-items:center;margin-bottom:12px;box-shadow:0 5px 18px rgba(24,33,43,.04)}
+.search{flex:1;min-width:180px;padding:11px 13px;border:1px solid #d5dfe4;border-radius:10px;font-family:inherit;font-size:12.5px;outline:none}
+.search:focus,select:focus{border-color:#6bb8b1;box-shadow:0 0 0 3px rgba(15,118,110,.09)}
+select{padding:11px 13px;border:1px solid #d5dfe4;border-radius:10px;background:white;font-family:inherit;font-size:12.5px;white-space:nowrap;color:var(--ink)}
+.tablewrap{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:auto;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:900px}
+th{background:var(--ink2);color:#eaf0f3;font-size:10.5px;text-transform:uppercase;padding:13px 13px;text-align:left;white-space:nowrap;position:sticky;top:0;z-index:2;letter-spacing:.045em}
+th:first-child{border-radius:0}
+td{padding:12px 13px;border-top:1px solid #e9eef1;font-size:12.5px;text-align:left}
+tbody tr:hover{background:#f5faf9}
+tr.badrow{background:#fff8f7}
+.pendingrow{background:#fffaf1}.pendingrow .status{color:var(--orange);font-weight:800}
+.badrow .status{color:var(--red);font-weight:800}.okrow .status{color:var(--green);font-weight:800}
 .diff{font-weight:800}
-.badrow .diff{color:var(--bad)}
-.pendingrow{background:#fff7f7}.pendingrow .status{color:var(--bad);font-weight:800}
-.badrow .status{color:var(--bad);font-weight:800}
-.okrow .status{color:var(--ok);font-weight:800}
-.notice{margin:0 0 18px;padding:10px 14px;border-radius:10px;background:#fdecec;color:#7a1220;font-size:13px;line-height:1.45}
-.footer{margin:18px 0;color:var(--muted);font-size:12px}
-@media(max-width:1000px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}} @media(max-width:800px){.stats{grid-template-columns:1fr 1fr}.header{padding:22px}}
-
-/* Cabeçalho atualizado */
-header {
-  background: #b5121b !important;
-  color: #fff !important;
+.badrow .diff{color:var(--red)}
+.footer{margin:17px 0 4px;color:#7a8891;font-size:11px}
+body>div:last-of-type{text-align:center!important;margin:18px 0 10px!important;color:#7a8891!important;font-size:11px!important}
+/* Exportação PDF — mantém a mesma identidade visual do novo layout */
+@media print{
+ @page{size:A4 landscape;margin:0}
+ html,body{background:#fff!important;height:auto!important;overflow:visible!important}
+ body{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+ body>*:not(#pdfReport){display:none!important}
+ #pdfReport{display:block!important}
 }
-
-header h1 {
-  font-family: "Poppins", "Segoe UI", Arial, sans-serif !important;
-  font-weight: 700 !important;
-  letter-spacing: -0.5px;
-  color: #fff !important;
-}
-
-header p,
-header .subtitle,
-header small {
-  font-family: "Poppins", "Segoe UI", Arial, sans-serif !important;
-  font-weight: 400 !important;
-  color: #fff !important;
-}
-
-.auto-found{margin-top:10px;padding:9px 12px;border-radius:9px;background:#ecfdf5;color:#166534;border:1px solid #bbf7d0;font-size:12.5px;font-weight:700}
-.auto-missing{margin-top:10px;padding:9px 12px;border-radius:9px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;font-size:12.5px;font-weight:700}
-
-/* ===== Exportação em PDF via impressão do navegador — páginas com cabeçalho fixo ===== */
-@media print {
-  @page { size: A4 landscape; margin: 0; }
-  html, body {
-    background: #fff !important;
-    height: auto !important;
-    overflow: visible !important;
-  }
-  body {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  body > *:not(#pdfReport) { display: none !important; }
-  #pdfReport { display: block !important; }
-}
-
-.pdf-report {
-  display: none;
-  width: 100%;
-  box-sizing: border-box;
-  background: #fff;
-  color: #222;
-  font-family: "Segoe UI", Arial, sans-serif;
-  padding: 0;
-}
-.export-pdf-mode > *:not(#pdfReport) { display: none !important; }
-.export-pdf-mode #pdfReport { display: block !important; }
-
-.pdf-page {
-  display: block;
-  width: 100%;
-  min-height: 185mm;
-  box-sizing: border-box;
-  padding: 10mm;
-  break-after: page;
-  page-break-after: always;
-  break-inside: avoid;
-  page-break-inside: avoid;
-  overflow: hidden;
-}
-.pdf-page:last-child {
-  break-after: auto;
-  page-break-after: auto;
-}
-.pdf-report-title {
-  margin: 0 0 4px 0;
-  color: #c20f1a;
-  font-size: 18px;
-  line-height: 1.15;
-  font-weight: 500;
-}
-.pdf-report-subtitle {
-  margin: 0 0 8px 0;
-  color: #666;
-  font-size: 10px;
-  line-height: 1.2;
-}
-.pdf-report-summary {
-  margin: 0 0 10px 0;
-  color: #666;
-  font-size: 9px;
-  line-height: 1.25;
-  white-space: nowrap;
-}
-.pdf-report-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  font-size: 8.5px;
-}
-.pdf-report-table thead {
-  display: table-header-group;
-}
-.pdf-report-table th {
-  text-align: left !important;
-  background: #c20f1a !important;
-  color: #fff !important;
-  font-weight: 700;
-  padding: 5px 6px;
-  border: 0;
-  white-space: nowrap;
-}
-.pdf-report-table td {
-  padding: 4px 6px;
-  text-align: left !important;
-  border: 0;
-  color: #222;
-  white-space: nowrap;
-  vertical-align: middle;
-}
-.pdf-report-table tbody tr:nth-child(odd) { background: #f9eeee !important; }
-.pdf-report-table tbody tr:nth-child(even) { background: #fff !important; }
-.pdf-report-table tbody tr {
-  break-inside: avoid;
-  page-break-inside: avoid;
-}
-.pdf-report-table th:nth-child(1), .pdf-report-table td:nth-child(1) { width: 5.5%; }
-.pdf-report-table th:nth-child(2), .pdf-report-table td:nth-child(2) { width: 14%; }
-.pdf-report-table th:nth-child(3), .pdf-report-table td:nth-child(3) { width: 23%; }
-.pdf-report-table th:nth-child(4), .pdf-report-table td:nth-child(4) { width: 13%; }
-.pdf-report-table th:nth-child(5), .pdf-report-table td:nth-child(5) { width: 13%; }
-.pdf-report-table th:nth-child(6), .pdf-report-table td:nth-child(6) { width: 14%; }
-.pdf-report-table th:nth-child(7), .pdf-report-table td:nth-child(7) { width: 13%; }
-.pdf-report-table th:nth-child(8), .pdf-report-table td:nth-child(8) { width: 7%; }
-.pdf-report-table .pdf-status { color: #00843d; font-weight: 700; }
-.pdf-report-table .pdf-bad { color: #b00020; font-weight: 700; }
-.pdf-report-table .pdf-pending { color: #b45309; font-weight: 700; }
+.pdf-report{display:none;width:100%;box-sizing:border-box;background:#fff;color:#18212b;font-family:"Manrope","Segoe UI",Arial,sans-serif;padding:0}
+.export-pdf-mode>*:not(#pdfReport){display:none!important}.export-pdf-mode #pdfReport{display:block!important}
+.pdf-page{display:block;width:100%;min-height:185mm;box-sizing:border-box;padding:10mm;break-after:page;page-break-after:always;break-inside:avoid;page-break-inside:avoid;overflow:hidden}
+.pdf-page:last-child{break-after:auto;page-break-after:auto}
+.pdf-report-title{margin:0 0 4px;color:#0f766e;font-family:"Space Grotesk",sans-serif;font-size:18px;line-height:1.15;font-weight:700}
+.pdf-report-subtitle{margin:0 0 8px;color:#667680;font-size:10px;line-height:1.2}
+.pdf-report-summary{margin:0 0 10px;color:#667680;font-size:9px;line-height:1.25;white-space:nowrap}
+.pdf-report-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:8.5px}
+.pdf-report-table thead{display:table-header-group}
+.pdf-report-table th{text-align:left!important;background:#18212b!important;color:#fff!important;font-weight:700;padding:5px 6px;border:0;white-space:nowrap}
+.pdf-report-table td{padding:4px 6px;text-align:left!important;border:0;color:#222;white-space:nowrap;vertical-align:middle}
+.pdf-report-table tbody tr:nth-child(odd){background:#eef6f5!important}.pdf-report-table tbody tr:nth-child(even){background:#fff!important}
+.pdf-report-table tbody tr{break-inside:avoid;page-break-inside:avoid}
+.pdf-report-table th:nth-child(1),.pdf-report-table td:nth-child(1){width:5.5%}.pdf-report-table th:nth-child(2),.pdf-report-table td:nth-child(2){width:14%}.pdf-report-table th:nth-child(3),.pdf-report-table td:nth-child(3){width:23%}.pdf-report-table th:nth-child(4),.pdf-report-table td:nth-child(4){width:13%}.pdf-report-table th:nth-child(5),.pdf-report-table td:nth-child(5){width:13%}.pdf-report-table th:nth-child(6),.pdf-report-table td:nth-child(6){width:14%}.pdf-report-table th:nth-child(7),.pdf-report-table td:nth-child(7){width:13%}.pdf-report-table th:nth-child(8),.pdf-report-table td:nth-child(8){width:7%}
+.pdf-report-table .pdf-status{color:#16803c;font-weight:700}.pdf-report-table .pdf-bad{color:#c2413b;font-weight:700}.pdf-report-table .pdf-pending{color:#d97706;font-weight:700}
+@media(max-width:1050px){.stats{grid-template-columns:repeat(2,1fr)}.hero-grid{grid-template-columns:1fr}}
+@media(max-width:700px){.header{padding:0 18px}.header-inner{min-height:92px}.header-badge{display:none}.container{padding:0 14px;margin-top:18px}.stats{grid-template-columns:1fr 1fr}.status-stack{flex-direction:column}.toolbar{flex-wrap:wrap}.search{min-width:100%}}
+@media(max-width:480px){.stats{grid-template-columns:1fr}.upload,.rule-card{padding:21px}.upload-controls{flex-wrap:wrap}}
 </style>
-
-<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
 </head>
 <body>
-<div class="header">
-  <h1>📊 Conferência do Gerencial</h1>
-  <p>Líder Comércio e Indústria Ltda · Conferência de Vendas</p>
-</div>
-<div class="container">
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark">✓</div>
+      <div><h1>Conferência do Gerencial</h1><p>Líder Comércio e Indústria Ltda · Conferência de Vendas</p></div>
+    </div>
+    <div class="header-badge">Painel de conferência</div>
+  </div>
+</header>
 
-  <div class="top-grid">
-    <div class="card upload" id="dropArea">
-      <strong>📎 Selecionar relatório em PDF</strong>
-      <span class="hint">Clique no botão abaixo, ou arraste e solte o arquivo aqui.</span>
-      <span class="warn">Padrão do nome do arquivo: <b>DDMM.pdf</b>. Exemplo: 08/09/2026 → <b>0809.pdf</b>.</span>
+<main class="container">
+  <section class="hero-grid">
+    <div class="panel upload" id="dropArea">
+      <div class="eyebrow">Entrada do relatório</div>
+      <strong>Selecione ou arraste o PDF da venda</strong>
+      <span class="hint">O arquivo é processado diretamente no navegador, sem alterar o relatório original.</span>
+      <span class="warn">Padrão do nome: <b>DDMM.pdf</b> · Ex.: 08/09/2026 → <b>0809.pdf</b></span>
       <div class="upload-controls">
         <button class="primary" onclick="abrirSeletorManual()">📎 Selecionar PDF</button>
       </div>
@@ -232,35 +129,30 @@ header small {
       <div id="progress"></div>
     </div>
 
-    <div class="card rule-card">
+    <div class="panel rule-card">
+      <div class="rule-icon">◈</div>
       <p class="card-title">Regra da conferência</p>
       <p>Quando o <b>VL. Gerencial</b> for maior ou igual à <b>Venda+eCommerce+CDAM</b>, a diferença é considerada <b>OK</b> (atualizada) e exibida em verde.<br><br>
       Só haverá divergência quando o VL. Gerencial for menor que a Venda+eCommerce+CDAM. A <b>Diferença acumulada</b> considera somente as diferenças negativas (divergências).</p>
     </div>
-  </div>
+  </section>
 
-  <div class="stats">
+  <section class="stats">
     <div class="stat"><div class="label">Filiais analisadas</div><div id="total" class="num">0</div></div>
     <div class="stat accent-ok"><div class="label">Sem divergência</div><div id="ok" class="num ok">0</div></div>
     <div class="stat accent-bad"><div class="label">Com divergência</div><div id="bad" class="num bad">0</div></div>
     <div class="stat accent-bad"><div class="label">Diferença acumulada</div><div id="sum" class="num bad">R$ 0,00</div></div>
     <div class="stat accent-bad"><div class="label">Filiais pendentes</div><div id="pending" class="num bad">0</div></div>
-  </div>
+  </section>
 
-  <div class="status-stack">
-    <div id="dataVenda" style="display:none;padding:9px 14px;border-radius:10px;background:#fff7ed;color:#9a3412;font-weight:800;text-align:center;border:1px solid #fed7aa;">
-      📅 Venda referente ao dia <span id="dataVendaTexto">--/--/----</span>
-    </div>
-    <div id="vendaAtualizada" style="display:none;padding:9px 14px;border-radius:10px;background:#dcfce7;color:#15803d;font-weight:800;text-align:center;border:1px solid #bbf7d0;">
-      ✓ Venda atualizada — todas as filiais estão OK e não há nenhuma divergência ou pendência.
-    </div>
-  </div>
+  <section class="status-stack">
+    <div id="dataVenda" style="display:none"><span>📅 Venda referente ao dia </span><span id="dataVendaTexto">--/--/----</span></div>
+    <div id="vendaAtualizada" style="display:none">✓ Venda atualizada — todas as filiais estão OK e não há nenhuma divergência ou pendência.</div>
+  </section>
 
-  <div id="observacaoFilial19" class="notice" style="display:none;">
-    ℹ️ <b>Observação:</b> aos domingos, a <b>filial 19</b> normalmente não funciona. Por isso, embora a conferência considere as <b>59 filiais cadastradas</b>, aos domingos são esperadas <b>58 filiais de venda</b>. A filial 19 só será considerada obrigatória quando houver venda registrada nessa data.
-  </div>
+  <div id="observacaoFilial19" class="notice" style="display:none">ℹ️ <b>Observação:</b> aos domingos, a <b>filial 19</b> normalmente não funciona. Por isso, embora a conferência considere as <b>59 filiais cadastradas</b>, aos domingos são esperadas <b>58 filiais de venda</b>. A filial 19 só será considerada obrigatória quando houver venda registrada nessa data.</div>
 
-  <div class="toolbar">
+  <section class="toolbar">
     <input id="search" class="search" placeholder="🔍 Pesquisar filial..." oninput="render()">
     <select id="status" onchange="render()">
       <option value="todos">Todas</option>
@@ -270,25 +162,22 @@ header small {
     </select>
     <button class="secondary" onclick="exportarCSV()">⬇ Exportar CSV</button>
     <button class="secondary" onclick="exportarPDF()">📄 Exportar PDF</button>
-  </div>
+  </section>
 
-  <div class="tablewrap">
+  <section class="tablewrap">
     <table>
-      <thead>
-        <tr>
-          <th>Filial</th><th>VL. Gerencial</th><th>Venda+eCommerce+CDAM</th>
-          <th>VL. Venda</th><th>VL. Devolução</th><th>VL. Líquido</th><th>Diferença</th><th>Status</th>
-        </tr>
-      </thead>
+      <thead><tr>
+        <th>Filial</th><th>VL. Gerencial</th><th>Venda+eCommerce+CDAM</th>
+        <th>VL. Venda</th><th>VL. Devolução</th><th>VL. Líquido</th><th>Diferença</th><th>Status</th>
+      </tr></thead>
       <tbody id="tbody"></tbody>
     </table>
-  </div>
+  </section>
   <div class="footer">Relatório diário do Gerencial · Estrutura baseada no PDF fornecido.</div>
-</div>
-
+</main>
 
 <div id="pdfReport" class="pdf-report" aria-hidden="true"></div>
-
+<div style="text-align:center;margin:22px 0 8px;color:#7a8891;font-size:11px;font-weight:600;">Copyright ©2026 CPD MATRIZ — Todos os direitos reservados</div>
 <script>
 const FILIAIS_ESPERADAS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 17, 18, 19, 24, 27, 28, 31, 32, 33, 36, 37, 38, 40, 41, 42, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 56, 57, 58, 63, 64, 71, 73, 75, 76, 77, 80, 81, 84, 85, 86, 87, 88, 89, 90, 91];
 const baseData = [{"filial": 1, "gerencial": "270.001,39", "venda": "270.001,39", "devolucao": "270.001,39", "liquido": "1.003,01"}, {"filial": 2, "gerencial": "446.561,76", "venda": "446.561,76", "devolucao": "445.809,31", "liquido": "4.077,76"}, {"filial": 3, "gerencial": "860.126,53", "venda": "860.126,53", "devolucao": "843.687,90", "liquido": "7.648,27"}, {"filial": 4, "gerencial": "272.337,86", "venda": "272.337,86", "devolucao": "272.337,86", "liquido": "5.990,99"}, {"filial": 5, "gerencial": "324.582,91", "venda": "324.582,91", "devolucao": "323.326,34", "liquido": "202,16"}, {"filial": 6, "gerencial": "243.879,34", "venda": "243.227,94", "devolucao": "236.651,10", "liquido": "2.004,80"}, {"filial": 7, "gerencial": "709.250,53", "venda": "709.044,56", "devolucao": "692.778,63", "liquido": "8.533,18"}, {"filial": 8, "gerencial": "367.538,40", "venda": "367.538,40", "devolucao": "367.538,40", "liquido": "206,79"}, {"filial": 9, "gerencial": "464.724,54", "venda": "464.724,54", "devolucao": "463.345,54", "liquido": "2.974,00"}, {"filial": 10, "gerencial": "323.138,62", "venda": "323.138,62", "devolucao": "323.138,62", "liquido": ""}, {"filial": 11, "gerencial": "361.608,04", "venda": "361.608,04", "devolucao": "361.608,04", "liquido": "564,51"}, {"filial": 12, "gerencial": "633.465,08", "venda": "632.080,22", "devolucao": "623.384,05", "liquido": "3.031,97"}, {"filial": 13, "gerencial": "7.156,35", "venda": "7.156,35", "devolucao": "7.156,35", "liquido": "12,90"}, {"filial": 17, "gerencial": "552.352,68", "venda": "552.352,68", "devolucao": "552.352,68", "liquido": "603,05"}, {"filial": 18, "gerencial": "825.713,28", "venda": "825.713,28", "devolucao": "805.727,11", "liquido": "3.146,56"}, {"filial": 19, "gerencial": "143.313,29", "venda": "142.614,29", "devolucao": "131.620,29", "liquido": "5.967,59"}, {"filial": 24, "gerencial": "967.834,97", "venda": "954.575,88", "devolucao": "898.055,25", "liquido": "30.995,57"}, {"filial": 27, "gerencial": "347.605,88", "venda": "347.605,88", "devolucao": "347.605,88", "liquido": "347,20"}, {"filial": 28, "gerencial": "731.115,95", "venda": "731.115,95", "devolucao": "713.920,03", "liquido": "9.250,36"}, {"filial": 31, "gerencial": "932.262,87", "venda": "930.483,87", "devolucao": "894.714,48", "liquido": "5.727,54"}, {"filial": 32, "gerencial": "533.306,30", "venda": "533.306,30", "devolucao": "525.617,84", "liquido": "2.301,39"}, {"filial": 33, "gerencial": "37.553,01", "venda": "547.119,56", "devolucao": "517.008,84", "liquido": "4.477,75"}, {"filial": 36, "gerencial": "361.896,77", "venda": "361.896,77", "devolucao": "354.189,24", "liquido": "843,64"}, {"filial": 37, "gerencial": "507.638,44", "venda": "507.638,44", "devolucao": "504.575,35", "liquido": "5.340,49"}, {"filial": 38, "gerencial": "555.414,28", "venda": "552.636,28", "devolucao": "447.780,35", "liquido": "3.110,60"}, {"filial": 40, "gerencial": "585.309,42", "venda": "585.309,42", "devolucao": "585.180,42", "liquido": "6.801,35"}, {"filial": 41, "gerencial": "42.428,39", "venda": "40.870,39", "devolucao": "16.784,50", "liquido": "209,00"}, {"filial": 42, "gerencial": "453.698,57", "venda": "453.698,57", "devolucao": "422.935,80", "liquido": "3.481,86"}, {"filial": 45, "gerencial": "27.684,16", "venda": "27.684,16", "devolucao": "27.684,16", "liquido": "64,03"}, {"filial": 46, "gerencial": "17.652,10", "venda": "17.652,10", "devolucao": "17.652,10", "liquido": "89,89"}, {"filial": 47, "gerencial": "352.411,65", "venda": "352.411,65", "devolucao": "344.867,59", "liquido": "1.301,15"}, {"filial": 48, "gerencial": "369.498,24", "venda": "369.498,24", "devolucao": "365.753,88", "liquido": "3.531,66"}, {"filial": 49, "gerencial": "14.022,35", "venda": "14.022,35", "devolucao": "14.022,35", "liquido": "15,95"}, {"filial": 50, "gerencial": "476.875,52", "venda": "476.875,52", "devolucao": "442.373,52", "liquido": "3.004,48"}, {"filial": 51, "gerencial": "18.987,10", "venda": "18.987,10", "devolucao": "18.987,10", "liquido": "13,00"}, {"filial": 52, "gerencial": "11.110,46", "venda": "11.110,46", "devolucao": "11.110,46", "liquido": ""}, {"filial": 53, "gerencial": "15.403,71", "venda": "15.403,71", "devolucao": "15.403,71", "liquido": "41,00"}, {"filial": 54, "gerencial": "566.914,47", "venda": "566.914,47", "devolucao": "566.914,47", "liquido": "1.399,62"}, {"filial": 56, "gerencial": "10.340,11", "venda": "10.340,11", "devolucao": "10.340,11", "liquido": "74,75"}, {"filial": 57, "gerencial": "17.137,36", "venda": "17.137,36", "devolucao": "17.137,36", "liquido": "5,99"}, {"filial": 58, "gerencial": "11.333,44", "venda": "11.333,44", "devolucao": "11.333,44", "liquido": "20,50"}, {"filial": 63, "gerencial": "8.246,64", "venda": "8.246,64", "devolucao": "8.246,64", "liquido": "41,56"}, {"filial": 64, "gerencial": "7.972,81", "venda": "7.972,81", "devolucao": "7.972,81", "liquido": "9,95"}, {"filial": 71, "gerencial": "17.331,85", "venda": "17.331,85", "devolucao": "17.331,85", "liquido": "20,00"}, {"filial": 73, "gerencial": "18.681,04", "venda": "18.681,04", "devolucao": "18.681,04", "liquido": "20,00"}, {"filial": 75, "gerencial": "13.374,92", "venda": "13.374,92", "devolucao": "13.374,92", "liquido": "22,40"}, {"filial": 76, "gerencial": "14.068,28", "venda": "14.068,28", "devolucao": "14.068,28", "liquido": ""}, {"filial": 77, "gerencial": "10.539,92", "venda": "10.539,92", "devolucao": "10.539,92", "liquido": ""}, {"filial": 80, "gerencial": "8.010,31", "venda": "8.010,31", "devolucao": "8.010,31", "liquido": "43,93"}, {"filial": 81, "gerencial": "15.964,26", "venda": "15.964,26", "devolucao": "15.964,26", "liquido": "49,90"}, {"filial": 84, "gerencial": "8.979,73", "venda": "8.979,73", "devolucao": "8.979,73", "liquido": "8,95"}, {"filial": 85, "gerencial": "22.006,79", "venda": "22.006,79", "devolucao": "22.006,79", "liquido": "53,76"}, {"filial": 86, "gerencial": "4.316,97", "venda": "4.316,97", "devolucao": "4.316,97", "liquido": "9,00"}, {"filial": 87, "gerencial": "9.671,90", "venda": "9.671,90", "devolucao": "9.671,90", "liquido": ""}, {"filial": 88, "gerencial": "17.805,92", "venda": "17.805,92", "devolucao": "17.805,92", "liquido": ""}, {"filial": 89, "gerencial": "18.230,42", "venda": "18.230,42", "devolucao": "18.230,42", "liquido": "130,30"}, {"filial": 90, "gerencial": "6.528,45", "venda": "6.528,45", "devolucao": "6.528,45", "liquido": "35,00"}, {"filial": 91, "gerencial": "14.003,22", "venda": "14.003,22", "devolucao": "14.003,22", "liquido": "84,89"}];
@@ -884,10 +773,5 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 </script>
-
-  <div style="text-align:center;margin:22px 0 8px;color:#7a5a5a;font-size:12px;font-weight:600;">
-    Copyright ©2026 CPD MATRIZ — Todos os direitos reservados
-  </div>
-
 </body>
 </html>
