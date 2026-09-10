@@ -104,7 +104,7 @@ header small {
 
 /* ===== Exportação em PDF via impressão do navegador — páginas com cabeçalho fixo ===== */
 @media print {
-  @page { size: A4 landscape; margin: 10mm; }
+  @page { size: A4 landscape; margin: 0; }
   html, body {
     background: #fff !important;
     height: auto !important;
@@ -135,6 +135,7 @@ header small {
   width: 100%;
   min-height: 185mm;
   box-sizing: border-box;
+  padding: 10mm;
   break-after: page;
   page-break-after: always;
   break-inside: avoid;
